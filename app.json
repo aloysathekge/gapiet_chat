@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "supa_chat",
-    "slug": "supa_chat",
+    "name": "gapiet_chat",
+    "slug": "gapiet_chat",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
