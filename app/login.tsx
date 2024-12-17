@@ -10,17 +10,28 @@ import { hp } from "@/helpers/common";
 import AppTextInput from "@/components/AppTextInput";
 import Icon from "@/assets/icons";
 import { AppButton } from "@/components/AppButton";
+import { useSupabase } from "@/providers/supabase-provider";
 
 export default function login() {
   const router = useRouter();
+  const { signInWithPassword } = useSupabase();
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     //
     if (!email || !password) {
       Alert.alert("Login Error", "please fill all Inputs");
+    }
+
+    setLoading(true);
+    try {
+      await signInWithPassword(email, password);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log("Error here", error);
     }
   };
 

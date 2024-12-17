@@ -7,6 +7,7 @@ import {
   Text,
   View,
   ScrollView,
+  Keyboard,
 } from "react-native";
 import React, { useState } from "react";
 import { AppScreenContainer } from "@/components/AppScreenContainer";
@@ -25,9 +26,24 @@ export default function SignUp() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const { signUp, session } = useSupabase();
+
+  const handleConfirmPassword = () => {
+    Keyboard.dismiss();
+    if (confirmPassword !== password) {
+      setPasswordError("Passwords do not match");
+      return;
+    }
+    if (password.length < 7) {
+      setPasswordError("Requires 8 or more characters");
+      return;
+    }
+    handleSignUp();
+  };
 
   const handleSignUp = async () => {
     //
@@ -91,12 +107,29 @@ export default function SignUp() {
               returnKeyType="done"
               onSubmitEditing={handleSignUp}
             />
+            <AppTextInput
+              icon={<Icon name="lock" size={26} strokeWidth={1.6} />}
+              placeholder="confirm your password"
+              secureTextEntry
+              onChangeText={setPassword}
+              returnKeyType="done"
+              onSubmitEditing={handleConfirmPassword}
+            />
             <AppButton
               label="Signup"
-              onPress={handleSignUp}
+              onPress={handleConfirmPassword}
               loading={loading}
             />
-
+            <Text
+              style={{
+                alignSelf: "center",
+                fontSize: 12,
+                fontWeight: "bold",
+                color: "red",
+              }}
+            >
+              {passwordError}
+            </Text>
             <View style={styles.footer}>
               <ThemedText type="default">have an account already? </ThemedText>
               <Pressable onPress={() => router.push("/login")}>
