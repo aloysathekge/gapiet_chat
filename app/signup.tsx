@@ -1,4 +1,13 @@
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+} from "react-native";
 import React, { useState } from "react";
 import { AppScreenContainer } from "@/components/AppScreenContainer";
 import { ScreenContent } from "@/components/ScreenContent";
@@ -10,6 +19,7 @@ import { hp } from "@/helpers/common";
 import AppTextInput from "@/components/AppTextInput";
 import Icon from "@/assets/icons";
 import { AppButton } from "@/components/AppButton";
+import { useSupabase } from "@/providers/supabase-provider";
 
 export default function SignUp() {
   const router = useRouter();
@@ -17,63 +27,85 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const { signUp, session } = useSupabase();
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     //
     if (!email || !password) {
       Alert.alert("SignUp Error", "please fill all Inputs");
     }
+    setLoading(true);
+    try {
+      console.log("Session before signup:", session);
+
+      await signUp(email, password, name);
+      console.log("Session after signup:", session);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <AppScreenContainer>
+    <AppScreenContainer containerStyle={{ backgroundColor: "#fff" }}>
       <BackButton router={router} />
-      <ScreenContent style={{ padding: theme.Units.medium }}>
-        <ThemedText type="title">Hey, </ThemedText>
-        <ThemedText type="title">Welcome to Gapiet </ThemedText>
-        {/* Form */}
-        <View style={styles.form}>
-          <ThemedText type="default">
-            Please fill in to create an Account
-          </ThemedText>
-          <AppTextInput
-            icon={<Icon name="user" size={26} strokeWidth={1.6} />}
-            placeholder="Please enter your name"
-            onChangeText={(value) => {
-              setEmail(value);
-            }}
-          />
-          <AppTextInput
-            icon={<Icon name="mail" size={26} strokeWidth={1.6} />}
-            placeholder="Please enter your email"
-            onChangeText={(value) => {
-              setEmail(value);
-            }}
-          />
-          <AppTextInput
-            icon={<Icon name="lock" size={26} strokeWidth={1.6} />}
-            placeholder="Please enter your password"
-            secureTextEntry
-            onChangeText={(value) => {
-              setPassword(value);
-            }}
-          />
-          {/* <ThemedText
-            type="defaultSemiBold"
-            style={{ textAlign: "right", color: theme.colors.text }}
-          >
-            forgot password?
-          </ThemedText> */}
-          <AppButton label="Signup" onPress={handleSignUp} loading={loading} />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            padding: theme.Units.medium,
+          }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <ThemedText type="title">Hey, </ThemedText>
+          <ThemedText type="title">Welcome to Gapiet </ThemedText>
 
-          <View style={styles.footer}>
-            <ThemedText type="default">have an account already? </ThemedText>
-            <Pressable onPress={() => router.push("/login")}>
-              <ThemedText type="link">Login </ThemedText>
-            </Pressable>
+          <View style={styles.form}>
+            <ThemedText type="default">
+              Please fill in to create an Account
+            </ThemedText>
+            <AppTextInput
+              icon={<Icon name="user" size={26} strokeWidth={1.6} />}
+              placeholder="Please enter your name"
+              onChangeText={setName}
+              returnKeyType="next"
+            />
+            <AppTextInput
+              icon={<Icon name="mail" size={26} strokeWidth={1.6} />}
+              placeholder="Please enter your email"
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              returnKeyType="next"
+            />
+            <AppTextInput
+              icon={<Icon name="lock" size={26} strokeWidth={1.6} />}
+              placeholder="Please enter your password"
+              secureTextEntry
+              onChangeText={setPassword}
+              returnKeyType="done"
+              onSubmitEditing={handleSignUp}
+            />
+            <AppButton
+              label="Signup"
+              onPress={handleSignUp}
+              loading={loading}
+            />
+
+            <View style={styles.footer}>
+              <ThemedText type="default">have an account already? </ThemedText>
+              <Pressable onPress={() => router.push("/login")}>
+                <ThemedText type="link">Login </ThemedText>
+              </Pressable>
+            </View>
           </View>
-        </View>
-      </ScreenContent>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </AppScreenContainer>
   );
 }
