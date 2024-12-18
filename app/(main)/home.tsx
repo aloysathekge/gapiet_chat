@@ -6,14 +6,17 @@ import { wp } from "@/helpers/common";
 import { AppButton } from "@/components/AppButton";
 import { useSignOut, useSupabase } from "@/providers/supabase-provider";
 import { useGetUser } from "@/hooks/queries";
+import MainHeader from "@/components/MainHeader";
 
-export default function home() {
+export default function Home() {
   const { error, isError, isLoading, signOut } = useSignOut();
-  const { user } = useSupabase();
-  const { data } = useGetUser(user?.id ?? "");
-  console.log(" users data are", data?.name);
+  const { userProfile: data, user } = useSupabase();
+  const { data: ass } = useGetUser(user?.id ?? "");
+  console.log(" users data are not:", data?.name);
+
   return (
     <AppScreenContainer>
+      <MainHeader />
       <ScreenContent style={{ paddingHorizontal: wp(10) }}>
         <Text>home</Text>
         <AppButton label="logout" onPress={signOut} loading={isLoading} />

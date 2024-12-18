@@ -7,6 +7,8 @@ import { ArrowLeft } from "./ArrowLeft";
 import Mail from "./Mail";
 import Lock from "./Lock";
 import User from "./User";
+import Heart from "./Heart";
+import Plus from "./Plus";
 
 const icons = {
   home: Home,
@@ -14,6 +16,8 @@ const icons = {
   mail: Mail,
   lock: Lock,
   user: User,
+  heart: Heart,
+  plus: Plus,
 };
 export default function Icon({
   name,

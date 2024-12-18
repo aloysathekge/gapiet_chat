@@ -34,11 +34,11 @@ export default function RootLayout() {
     return null;
   }
   return (
-    <SupabaseProvider>
-      <QueryProvider>
+    <QueryProvider>
+      <SupabaseProvider>
         <Slot />
         <AuthenticatedLayout />
-      </QueryProvider>
-    </SupabaseProvider>
+      </SupabaseProvider>
+    </QueryProvider>
   );
 }

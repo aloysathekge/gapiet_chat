@@ -3,8 +3,10 @@ import { useRouter, useSegments, SplashScreen } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { supabase } from "@/lib/supabase";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Database } from "@/lib/database.types";
+import { userType } from "@/lib/types";
+import { useGetUser } from "@/hooks/queries";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -12,6 +14,7 @@ type SupabaseContextProps = {
   user: User | null;
   session: Session | null;
   initialized?: boolean;
+  userProfile: userType | null;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signInWithPassword: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -25,6 +28,7 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
   user: null,
   session: null,
   initialized: false,
+  userProfile: null,
   signUp: async () => {},
   signInWithPassword: async () => {},
   signOut: async () => {},
@@ -61,6 +65,15 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [initialized, setInitialized] = useState<boolean>(false);
+  const [userProfile, setUserProfile] = useState<userType | null>(null);
+
+  const { data: userData, isLoading, error } = useGetUser(user?.id ?? "");
+
+  useEffect(() => {
+    if (userData) {
+      setUserProfile(userData);
+    }
+  }, [userData]);
 
   const signUp = async (email: string, password: string, name: string) => {
     const { error } = await supabase.auth.signUp({
@@ -91,6 +104,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
+      setUserProfile(null);
     } catch (error) {
       console.log("error", error);
       throw error;
@@ -115,6 +129,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
         user,
         session,
         initialized,
+        userProfile,
         signUp,
         signInWithPassword,
         signOut,

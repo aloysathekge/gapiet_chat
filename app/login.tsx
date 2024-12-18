@@ -51,6 +51,9 @@ export default function login() {
             onChangeText={(value) => {
               setEmail(value);
             }}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            returnKeyType="next"
           />
           <AppTextInput
             icon={<Icon name="lock" size={26} strokeWidth={1.6} />}
