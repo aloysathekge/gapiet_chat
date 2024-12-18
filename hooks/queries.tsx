@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useSupabase } from "@/providers/supabase-provider";
+import { userType } from "@/lib/types";
 
 export const useGetUser = (userId: string) => {
   return useQuery({
@@ -13,7 +14,7 @@ export const useGetUser = (userId: string) => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as userType;
     },
   });
 };

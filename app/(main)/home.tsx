@@ -11,7 +11,7 @@ export default function home() {
   const { error, isError, isLoading, signOut } = useSignOut();
   const { user } = useSupabase();
   const { data } = useGetUser(user?.id ?? "");
-  console.log(" users data are", data);
+  console.log(" users data are", data?.name);
   return (
     <AppScreenContainer>
       <ScreenContent style={{ paddingHorizontal: wp(10) }}>
