@@ -9,7 +9,7 @@ import { theme } from "@/constants/theme";
 type AppHeaderProps = {
   title: string;
   showBackButton: boolean;
-  mB?: 10;
+  mB: number;
   containerStyle?: StyleProp<ViewStyle>;
 };
 export default function AppHeader({
@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
   showBackButton: {
     position: "absolute",
     left: 0,
-    backgroundColor: "red",
   },
   title: {
     fontSize: hp(2.7),

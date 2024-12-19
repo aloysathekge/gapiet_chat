@@ -7,7 +7,7 @@ type avatarProps = {
   size: number;
   uri: string | { uri: string } | number;
   rounded: number;
-  style: any;
+  style?: any;
 };
 export default function Avatar({ size, uri, rounded, style }: avatarProps) {
   return (

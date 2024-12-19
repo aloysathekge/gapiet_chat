@@ -9,6 +9,9 @@ import Lock from "./Lock";
 import User from "./User";
 import Heart from "./Heart";
 import Plus from "./Plus";
+import ThreeDotsCircle from "./ThreeDotsCircle";
+import Edit from "./Edit";
+import Call from "./Call";
 
 const icons = {
   home: Home,
@@ -18,6 +21,9 @@ const icons = {
   user: User,
   heart: Heart,
   plus: Plus,
+  threeDots: ThreeDotsCircle,
+  edit:Edit,
+  call:Call
 };
 export default function Icon({
   name,

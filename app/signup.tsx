@@ -111,7 +111,7 @@ export default function SignUp() {
               icon={<Icon name="lock" size={26} strokeWidth={1.6} />}
               placeholder="confirm your password"
               secureTextEntry
-              onChangeText={setPassword}
+              onChangeText={setConfirmPassword}
               returnKeyType="done"
               onSubmitEditing={handleConfirmPassword}
             />
