@@ -1,12 +1,17 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { hp, wp } from "@/helpers/common";
 import { theme } from "@/constants/theme";
 import Icon from "@/assets/icons";
 import { useRouter } from "expo-router";
+import Avatar from "./Avatar";
+import { useGetUserImage } from "@/app/utils/getUserImage";
 
 export default function MainHeader() {
   const router = useRouter();
+
+  const getUserImage = useGetUserImage();
+
   return (
     <View style={styles.header}>
       <Text style={styles.title}>Gapiet</Text>
@@ -19,7 +24,7 @@ export default function MainHeader() {
             color={theme.colors.text}
           />
         </Pressable>
-        <Pressable>
+        <Pressable onPress={() => router.push("/newPost")}>
           <Icon
             name="plus"
             size={hp(3.2)}
@@ -28,11 +33,11 @@ export default function MainHeader() {
           />
         </Pressable>
         <Pressable onPress={() => router.push("/profile")}>
-          <Icon
-            name="user"
-            size={hp(3.2)}
-            strokeWidth={2}
-            color={theme.colors.text}
+          <Avatar
+            uri={getUserImage()}
+            rounded={theme.radius.sm}
+            size={hp(4.3)}
+            style={{ borderWidth: 2 }}
           />
         </Pressable>
       </View>
@@ -53,14 +58,6 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     fontSize: hp(3.2),
     fontWeight: "bold",
-  },
-  avatarImage: {
-    height: hp(4.3),
-    width: hp(4.3),
-    borderRadius: theme.radius.sm,
-    borderColor: theme.colors.gray,
-    borderWidth: 3,
-    borderCurve: "continuous",
   },
   icons: {
     flexDirection: "row",

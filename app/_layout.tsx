@@ -21,15 +21,15 @@ export default function RootLayout() {
       }
     }, [initialized, session, segments]);
 
-    if (!initialized) {
-      return (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" />
-        </View>
-      );
-    }
+    // if (!initialized) {
+    //   return (
+    //     <View
+    //       style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+    //     >
+    //       <ActivityIndicator size="large" />
+    //     </View>
+    //   );
+    // }
 
     return null;
   }

@@ -15,7 +15,7 @@ export default function Home() {
   console.log(" users data are not:", data?.name);
 
   return (
-    <AppScreenContainer>
+    <AppScreenContainer containerStyle={{ backgroundColor: "#fff" }}>
       <MainHeader />
       <ScreenContent style={{ paddingHorizontal: wp(10) }}>
         <Text>home</Text>
