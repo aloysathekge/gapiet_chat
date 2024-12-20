@@ -18,7 +18,7 @@ import AppHeader from "@/components/AppHeader";
 import { useGetUser, useUpdateUser } from "@/hooks/queries";
 import { useRouter } from "expo-router";
 import { useSupabase } from "@/providers/supabase-provider";
-import useGetUserImage from "../utils/getUserImage";
+import useGetUserImage, { uploadFile } from "../utils/getUserImage";
 import Icon from "@/assets/icons";
 import { hp } from "@/helpers/common";
 import { userType } from "@/lib/types";
@@ -51,19 +51,32 @@ export default function EditProfileScreen() {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
-      console.log('Selected image URI:', result.assets[0].uri);
-      console.log('Image state after setting:', image);
+      console.log("Selected image URI:", result.assets[0].uri);
+      console.log("Image state after setting:", image);
       setUser({ ...user, image: result.assets[0].uri });
     }
   };
 
   const handleUpdateUser = async () => {
     try {
+      let imageUrl = user.image;
+
+      // If there's a new image selected, upload it first
+      if (image && image !== currentUser?.image) {
+        const { data: uploadData } = await uploadFile(
+          "pictures",
+          { uri: image },
+          true
+        );
+
+        imageUrl = uploadData;
+      }
       const { data, error } = await updateUser(user.id, {
         name: user.name,
         bio: user.bio,
         phone: user.phone,
         address: user.address,
+        image: imageUrl,
       });
       if (error) throw error;
       // Show success message
@@ -76,7 +89,7 @@ export default function EditProfileScreen() {
   };
   const hasChanges = JSON.stringify(user) !== JSON.stringify(currentUser);
   let imageSource = image ? { uri: image } : getUserImage();
-  console.log('Current imageSource:', imageSource);
+  console.log("Current imageSource:", imageSource);
   return (
     <AppScreenContainer>
       <AppHeader
