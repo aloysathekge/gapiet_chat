@@ -18,6 +18,7 @@ export type Database = {
           image: string | null
           name: string | null
           phone: string | null
+          email:string|null
         }
         Insert: {
           address?: string | null

@@ -8,19 +8,21 @@ import { ScreenContent } from "@/components/ScreenContent";
 import Avatar from "@/components/Avatar";
 import { hp } from "@/helpers/common";
 import { theme } from "@/constants/theme";
-import { useGetUser } from "@/hooks/queries";
 import useGetUserImage from "../utils/getUserImage";
 import Icon from "@/assets/icons";
 import { Feather } from "@expo/vector-icons";
 
 export default function Profile() {
   const router = useRouter();
-  const { userProfile: user } = useSupabase();
+  const { userProfile: user, isLoading } = useSupabase();
   const getUserImage = useGetUserImage();
   return (
     <AppScreenContainer>
       <UserHeader router={router} user={user!} />
-      <ScreenContent style={{ padding: theme.Units.medium }}>
+      <ScreenContent
+        style={{ padding: theme.Units.medium }}
+        loading={isLoading}
+      >
         <View style={{ alignSelf: "center", height: hp(12), width: hp(12) }}>
           <Avatar
             uri={getUserImage()}
@@ -30,7 +32,7 @@ export default function Profile() {
 
           <Pressable
             style={styles.editIcon}
-            onPress={()=>router.push("/(main)/EditProfileScreen")}
+            onPress={() => router.push("/(main)/EditProfileScreen")}
           >
             <Feather name="edit-3" size={24} color="black" />
           </Pressable>

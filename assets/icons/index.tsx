@@ -12,6 +12,8 @@ import Plus from "./Plus";
 import ThreeDotsCircle from "./ThreeDotsCircle";
 import Edit from "./Edit";
 import Call from "./Call";
+import Camera from "./camera";
+import Location from "./Location";
 
 const icons = {
   home: Home,
@@ -22,8 +24,10 @@ const icons = {
   heart: Heart,
   plus: Plus,
   threeDots: ThreeDotsCircle,
-  edit:Edit,
-  call:Call
+  edit: Edit,
+  call: Call,
+  camera: Camera,
+  location: Location,
 };
 export default function Icon({
   name,

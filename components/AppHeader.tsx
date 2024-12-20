@@ -16,10 +16,11 @@ export default function AppHeader({
   title,
   showBackButton,
   mB,
+  containerStyle,
 }: AppHeaderProps) {
   const router = useRouter();
   return (
-    <View style={[styles.container, { marginBottom: mB }]}>
+    <View style={[styles.container, { marginBottom: mB }, containerStyle]}>
       <View style={styles.showBackButton}>
         {showBackButton && <Icon name="arrowLeft" onPress={router.back} />}
       </View>

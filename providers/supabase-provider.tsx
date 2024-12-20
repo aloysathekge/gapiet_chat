@@ -15,6 +15,7 @@ type SupabaseContextProps = {
   session: Session | null;
   initialized?: boolean;
   userProfile: userType | null;
+  isLoading: boolean;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signInWithPassword: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -29,6 +30,7 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
   session: null,
   initialized: false,
   userProfile: null,
+  isLoading: false,
   signUp: async () => {},
   signInWithPassword: async () => {},
   signOut: async () => {},
@@ -129,6 +131,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
         user,
         session,
         initialized,
+        isLoading,
         userProfile,
         signUp,
         signInWithPassword,
