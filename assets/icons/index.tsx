@@ -16,6 +16,7 @@ import Camera from "./camera";
 import Location from "./Location";
 import Image from "./Image";
 import Video from "./Video";
+import Delete from "./Delete";
 
 const icons = {
   home: Home,
@@ -32,6 +33,7 @@ const icons = {
   location: Location,
   image: Image,
   video: Video,
+  delete: Delete,
 };
 export default function Icon({
   name,
