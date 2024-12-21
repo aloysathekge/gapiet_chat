@@ -95,6 +95,15 @@ export default function NewPost() {
     const res = await createUpdatePost(data);
     setLoading(false);
     console.log("post result", res);
+
+    if (res) {
+      setFile(null);
+      bodyRef.current = "";
+      editorRef.current?.setContentHTML("");
+      router.back();
+    } else {
+      Alert.alert("Failed to create post");
+    }
   };
   const getFileUri = (file: MediaFile): string | undefined => {
     console.log("Getting file URI for:", file); // Debugging line

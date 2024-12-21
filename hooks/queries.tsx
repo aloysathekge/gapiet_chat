@@ -65,7 +65,6 @@ export const useUpdateUser = () => {
 // Updating or uploading Post,
 export const createUpdatePost = async (post: any) => {
   try {
-    console.log("post.file:", post.file?.uri);
     if (post.file && typeof post.file === "object") {
       let isImage = post?.file?.type == "image";
       let folderName = isImage ? "postImages" : "postVideos";
@@ -87,6 +86,18 @@ export const createUpdatePost = async (post: any) => {
       }
       return data;
     }
+    const { data, error } = await supabase
+      .from("posts")
+      .upsert(post)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("could not update or create a post", error);
+      return null;
+    }
+
+    return data;
   } catch (error) {
     console.log("outer could not update or create a post", error);
   }
