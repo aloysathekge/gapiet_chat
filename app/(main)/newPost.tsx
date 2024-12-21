@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AppScreenContainer } from "@/components/AppScreenContainer";
 import AppHeader from "@/components/AppHeader";
 import { hp, wp } from "@/helpers/common";
@@ -39,6 +39,13 @@ export default function NewPost() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<ImagePicker.ImagePickerAsset | null>(null);
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+  const [bodyText, setBodyText] = useState("");
+
+  useEffect(() => {
+    setIsButtonEnabled(!!file || bodyText?.trim().length > 0);
+  }, [file, bodyText]);
+
   const onPick = async (isImage: boolean) => {
     let mediaConfig = {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -70,6 +77,9 @@ export default function NewPost() {
 
   const onSubmit = async () => {
     //submit Post
+
+    console.log("Text", bodyRef.current);
+    console.log("file", file);
   };
   const getFileUri = (file: MediaFile): string | undefined => {
     if (isLocal(file)) {
@@ -122,7 +132,10 @@ export default function NewPost() {
           <View style={styles.textEditor}>
             <RichTextEditor
               editorRef={editorRef}
-              onChange={(body) => (bodyRef.current = body)}
+              onChange={(body) => {
+                bodyRef.current = body;
+                setBodyText(body);
+              }}
             />
           </View>
           {file && (
@@ -131,14 +144,14 @@ export default function NewPost() {
                 <Video
                   style={{ flex: 1 }}
                   source={{ uri: getFileUri(file) ?? "" }}
-                  resizeMode="cover"
+                  resizeMode={"cover" as ResizeMode}
                   isLooping
                   useNativeControls
                 />
               ) : (
                 <>
                   <Image
-                    resizeMode="cover"
+                    resizeMode={"cover" as ResizeMode}
                     source={{ uri: getFileUri(file) }}
                     style={{ flex: 1 }}
                   />
@@ -163,10 +176,8 @@ export default function NewPost() {
         </ScrollView>
         <AppButton
           label="Post"
-          onPress={() => {
-            onSubmit;
-          }}
-          disabled
+          onPress={onSubmit}
+          disabled={!isButtonEnabled}
           loading={false}
           containerStyle={{ margin: theme.Units.medium }}
         />
