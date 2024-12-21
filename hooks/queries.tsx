@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useSupabase } from "@/providers/supabase-provider";
 import { userType } from "@/lib/types";
+import { uploadFile } from "@/app/utils/getUserImage";
 
 export const useGetUser = (userId: string) => {
   return useQuery({
@@ -59,4 +60,30 @@ export const useUpdateUser = () => {
     isError: mutation.isError,
     error: mutation.error,
   };
+};
+
+// Updating or uploading Post,
+export const createUpdatePost = async (post: any) => {
+  try {
+    console.log("post.file:", post.file?.uri);
+    if (post.file && typeof post.file === "object") {
+      let isImage = post?.file?.type == "image";
+      let folderName = isImage ? "postImages" : "postVideos";
+
+      const fileResult = await uploadFile(folderName, post?.file?.uri, isImage);
+      if (fileResult.success) post.file = fileResult.data;
+
+      const { data, error } = await supabase
+        .from("posts")
+        .upsert(post)
+        .select()
+        .single();
+      if (error) {
+        console.log("could not update or create a post", error);
+      }
+      return data;
+    }
+  } catch (error) {
+    console.log("outer could not update or create a post", error);
+  }
 };

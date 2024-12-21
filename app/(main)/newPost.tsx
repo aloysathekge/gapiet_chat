@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -24,6 +25,7 @@ import Icon from "@/assets/icons";
 import { AppButton } from "@/components/AppButton";
 import * as ImagePicker from "expo-image-picker";
 import { Video, ResizeMode } from "expo-av";
+import { createUpdatePost } from "@/hooks/queries";
 
 type MediaFile = ImagePicker.ImagePickerAsset | string;
 
@@ -43,6 +45,8 @@ export default function NewPost() {
   const [bodyText, setBodyText] = useState("");
 
   useEffect(() => {
+    console.log("File:", file);
+    console.log("Body Text:", bodyText);
     setIsButtonEnabled(!!file || bodyText?.trim().length > 0);
   }, [file, bodyText]);
 
@@ -67,8 +71,8 @@ export default function NewPost() {
 
     if (!result.canceled) {
       setFile(result.assets[0]);
-      console.log("Selected image URI:", result.assets[0].type);
-      console.log("Image state after setting:", image);
+      // console.log("Selected image URI:", result.assets[0].type);
+      // console.log("File state after setting:", file?.uri);
 
       //Set a Post
       //setUser({ ...user, image: result.assets[0].uri });
@@ -77,18 +81,39 @@ export default function NewPost() {
 
   const onSubmit = async () => {
     //submit Post
+    if (!file && !bodyRef.current) {
+      Alert.alert("Please post a media or text");
+    }
 
-    console.log("Text", bodyRef.current);
-    console.log("file", file);
+    let data = {
+      file,
+      body: bodyRef.current,
+      userId: user?.id,
+    };
+    setLoading(true);
+    console.log("data passed in here are", data);
+    const res = await createUpdatePost(data);
+    setLoading(false);
+    console.log("post result", res);
   };
   const getFileUri = (file: MediaFile): string | undefined => {
+    console.log("Getting file URI for:", file); // Debugging line
+    if (!file) {
+      console.log("No file provided.");
+      return undefined;
+    }
+
     if (isLocal(file)) {
+      console.log("Local file URI:", file.uri);
       return file.uri;
     }
-    // If it's already a string URI, return it directly
 
-    return getSupabaseFileUrl(file).uri;
+    console.log(
+      "File is not local, checking if URI can be fetched from Supabase..."
+    );
+    return getSupabaseFileUrl(file)?.uri;
   };
+
   const isLocal = (file: MediaFile): file is ImagePicker.ImagePickerAsset => {
     return typeof file === "object" && file !== null;
   };
@@ -96,7 +121,7 @@ export default function NewPost() {
     if (isLocal(file)) {
       return (file as ImagePicker.ImagePickerAsset).type;
     }
-    if (typeof file === "string" && file.includes("postImage")) {
+    if (typeof file === "string" && file.includes("postImages")) {
       return "image";
     }
   };
@@ -178,7 +203,7 @@ export default function NewPost() {
           label="Post"
           onPress={onSubmit}
           disabled={!isButtonEnabled}
-          loading={false}
+          loading={loading}
           containerStyle={{ margin: theme.Units.medium }}
         />
       </KeyboardAvoidingView>
