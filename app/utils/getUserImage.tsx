@@ -46,7 +46,7 @@ export const uploadFile = async (
 
     // Upload to Supabase storage
     const { data, error } = await supabase.storage
-      .from(folderName)
+      .from("pictures")
       .upload(fileName, arrayBuffer, {
         contentType: isImage ? "image/*" : "video/*",
         upsert: true,
