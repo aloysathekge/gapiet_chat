@@ -14,6 +14,8 @@ import Edit from "./Edit";
 import Call from "./Call";
 import Camera from "./camera";
 import Location from "./Location";
+import Image from "./Image";
+import Video from "./Video";
 
 const icons = {
   home: Home,
@@ -28,6 +30,8 @@ const icons = {
   call: Call,
   camera: Camera,
   location: Location,
+  image: Image,
+  video: Video,
 };
 export default function Icon({
   name,
