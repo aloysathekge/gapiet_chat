@@ -3,6 +3,7 @@ import { UriProps } from "react-native-svg";
 import * as FileSystem from "expo-file-system";
 import { decode } from "base64-arraybuffer";
 import { supabase } from "@/lib/supabase";
+import { userType } from "@/lib/types";
 
 export const useGetUserImage = () => {
   const { userProfile } = useSupabase();
@@ -17,7 +18,12 @@ export const useGetUserImage = () => {
 
   return getUserImage;
 };
-
+export const getImageFromUser = (user: userType | null) => {
+  if (user?.image && user.image !== "") {
+    return getSupabaseFileUrl(user.image);
+  }
+  return require("@/assets/images/defaultUser.png");
+};
 export const getSupabaseFileUrl = (filePath: string) => {
   return {
     uri: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/pictures/${filePath}`,

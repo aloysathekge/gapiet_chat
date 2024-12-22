@@ -6,7 +6,7 @@ import { User } from "@supabase/supabase-js";
 import { theme } from "@/constants/theme";
 import { hp } from "@/helpers/common";
 import Avatar from "./Avatar";
-import useGetUserImage from "@/app/utils/getUserImage";
+import useGetUserImage, { getImageFromUser } from "@/app/utils/getUserImage";
 
 type postCardProps = {
   item: PostWithUser;
@@ -29,8 +29,7 @@ export default function PostCard({
     shadowRadius: 6,
     elevation: 1,
   };
-  const getUserImage = useGetUserImage();
-
+  console.log(item.user.image);
   return (
     <View style={[styles.container, hasShadow && shadowStyle]}>
       <View style={styles.header}>
@@ -38,9 +37,12 @@ export default function PostCard({
         <View style={styles.userInfo}>
           <Avatar
             size={hp(4.5)}
-            uri={getUserImage()}
+            uri={getImageFromUser(item.user)}
             rounded={theme.radius.md}
           />
+          <View>
+            <Text style={styles.username}>{item.user.name}</Text>
+          </View>
         </View>
       </View>
     </View>
