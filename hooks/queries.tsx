@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useSupabase } from "@/providers/supabase-provider";
-import { postType, userType } from "@/lib/types";
+import { postType, PostWithUser, userType } from "@/lib/types";
 import { uploadFile } from "@/app/utils/getUserImage";
 
 export const useGetUser = (userId: string) => {
@@ -103,9 +103,6 @@ export const createUpdatePost = async (post: any) => {
   }
 };
 
-interface PostWithUser extends postType {
-  user: userType;
-}
 export const fetchPost = async (
   limit: number
 ): Promise<PostWithUser[] | null | undefined> => {
