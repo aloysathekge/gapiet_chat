@@ -9,21 +9,171 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      comments: {
+        Row: {
+          created_at: string
+          id: number
+          postId: number | null
+          text: string | null
+          userId: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          postId?: number | null
+          text?: string | null
+          userId?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          postId?: number | null
+          text?: string | null
+          userId?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_postId_fkey"
+            columns: ["postId"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          data: string | null
+          id: number
+          receiverId: string | null
+          senderId: string | null
+          title: string | null
+        }
+        Insert: {
+          created_at?: string
+          data?: string | null
+          id?: number
+          receiverId?: string | null
+          senderId?: string | null
+          title?: string | null
+        }
+        Update: {
+          created_at?: string
+          data?: string | null
+          id?: number
+          receiverId?: string | null
+          senderId?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_receiverId_fkey"
+            columns: ["receiverId"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_senderId_fkey"
+            columns: ["senderId"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      postLikes: {
+        Row: {
+          created_at: string
+          id: number
+          postId: number | null
+          userId: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          postId?: number | null
+          userId?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          postId?: number | null
+          userId?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "postLikes_postId_fkey"
+            columns: ["postId"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "postLikes_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          body: string | null
+          created_at: string
+          file: string | null
+          id: number
+          userId: string | null
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          file?: string | null
+          id?: number
+          userId?: string | null
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          file?: string | null
+          id?: number
+          userId?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           address: string | null
           bio: string | null
           created_at: string
+          email: string | null
           id: string
           image: string | null
           name: string | null
           phone: string | null
-          email:string|null
         }
         Insert: {
           address?: string | null
           bio?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           image?: string | null
           name?: string | null
@@ -33,6 +183,7 @@ export type Database = {
           address?: string | null
           bio?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           image?: string | null
           name?: string | null

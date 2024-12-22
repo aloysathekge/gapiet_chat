@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useSupabase } from "@/providers/supabase-provider";
-import { userType } from "@/lib/types";
+import { postType, userType } from "@/lib/types";
 import { uploadFile } from "@/app/utils/getUserImage";
 
 export const useGetUser = (userId: string) => {
@@ -100,5 +100,27 @@ export const createUpdatePost = async (post: any) => {
     return data;
   } catch (error) {
     console.log("outer could not update or create a post", error);
+  }
+};
+
+interface PostWithUser extends postType {
+  user: userType;
+}
+export const fetchPost = async (
+  limit: number
+): Promise<PostWithUser[] | null | undefined> => {
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select(`*,user:users(id, name, image)`)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.log("outer could fetch a post", error);
+    }
+    return data as PostWithUser[];
+  } catch (error) {
+    console.log("outer could fetch a post", error);
   }
 };
