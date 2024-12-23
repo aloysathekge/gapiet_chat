@@ -13,7 +13,6 @@ import PostCard from "@/components/PostCard";
 import { useRouter } from "expo-router";
 
 export default function Home() {
-  const { error, isError, isLoading, signOut } = useSignOut();
   const { userProfile: data, user } = useSupabase();
   const { data: ass } = useGetUser(user?.id ?? "");
   const [posts, setPosts] = useState<PostWithUser[] | null>([]);
@@ -26,13 +25,14 @@ export default function Home() {
   }, []);
 
   const getPosts = async () => {
-    const posts = await fetchPost(10);
-    console.log("Post results are", posts);
+    const postsResult = await fetchPost(10);
+    //console.log("Post results are", posts);
 
-    setPosts(posts ?? null);
-    posts?.forEach((post) => {
-      console.log(post?.user.name);
-    });
+    setPosts(postsResult ?? null);
+
+    // posts?.forEach((post) => {
+    //   console.log(post?.user.name);
+    // });
   };
 
   return (
@@ -48,7 +48,6 @@ export default function Home() {
             <PostCard item={item} currentUser={user} router={router} />
           )}
         />
-        <AppButton label="logout" onPress={signOut} loading={isLoading} />
       </ScreenContent>
     </AppScreenContainer>
   );

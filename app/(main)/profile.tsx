@@ -3,7 +3,7 @@ import React from "react";
 import { AppScreenContainer } from "@/components/AppScreenContainer";
 import UserHeader from "@/components/UserHeader";
 import { useRouter } from "expo-router";
-import { useSupabase } from "@/providers/supabase-provider";
+import { useSignOut, useSupabase } from "@/providers/supabase-provider";
 import { ScreenContent } from "@/components/ScreenContent";
 import Avatar from "@/components/Avatar";
 import { hp } from "@/helpers/common";
@@ -11,10 +11,13 @@ import { theme } from "@/constants/theme";
 import useGetUserImage from "../utils/getUserImage";
 import Icon from "@/assets/icons";
 import { Feather } from "@expo/vector-icons";
+import { AppButton } from "@/components/AppButton";
 
 export default function Profile() {
   const router = useRouter();
   const { userProfile: user, isLoading } = useSupabase();
+  const { error, isError, isLoading: isSigningOut, signOut } = useSignOut();
+
   const getUserImage = useGetUserImage();
   return (
     <AppScreenContainer>
@@ -64,6 +67,8 @@ export default function Profile() {
           {/* bio and email, phone */}
           {user?.bio && <Text>{user?.bio ?? ""}</Text>}
         </View>
+        {/* this will be move to somewhere appropriate */}
+        <AppButton label="logout" onPress={signOut} loading={isSigningOut} />
       </ScreenContent>
     </AppScreenContainer>
   );
