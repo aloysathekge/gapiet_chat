@@ -13,15 +13,20 @@ import { User } from "@supabase/supabase-js";
 import { theme } from "@/constants/theme";
 import { hp, wp } from "@/helpers/common";
 import Avatar from "./Avatar";
-import useGetUserImage, { getImageFromUser } from "@/app/utils/getUserImage";
+import useGetUserImage, {
+  getImageFromUser,
+  getSupabaseFileUrl,
+} from "@/app/utils/getUserImage";
 import moment from "moment";
 import { Entypo } from "@expo/vector-icons";
 import PostDetailsScreen from "@/app/(main)/PostDetailsScreen";
 import RenderHTML from "react-native-render-html";
+import { Image } from "expo-image";
+import { ResizeMode, Video } from "expo-av";
 LogBox.ignoreLogs([
   "Warning: TNodeChildrenRenderer",
   "Warning: MemoizedTNodeRenderer",
-  "Warning: TNodeChildrenRenderer",
+  "Warning: TRenderEngineProvider",
 ]);
 type postCardProps = {
   item: PostWithUser;
@@ -95,6 +100,26 @@ export default function PostCard({
               tagsStyles={tagStyles}
             />
           )}
+        </View>
+        {/* post Image */}
+        <View>
+          {item?.file &&
+            (item.file.includes("postImage") ? (
+              <Image
+                source={getSupabaseFileUrl(item.file)}
+                transition={100}
+                contentFit="cover"
+                style={styles.postMedia}
+              />
+            ) : (
+              <Video
+                source={getSupabaseFileUrl(item.file)}
+                style={[styles.postMedia, { height: hp(30), flex: 1 }]}
+                isLooping
+                useNativeControls
+                resizeMode={"cover" as ResizeMode}
+              />
+            ))}
         </View>
       </View>
     </View>
