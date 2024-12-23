@@ -18,6 +18,7 @@ import { PostWithUser } from "@/lib/types";
 import PostCard from "@/components/PostCard";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
+let limit = 0;
 
 export default function Home() {
   const { userProfile: data, user } = useSupabase();
@@ -57,10 +58,11 @@ export default function Home() {
   }, []);
 
   const getPosts = async () => {
-    const postsResult = await fetchPost(10);
-    //console.log("Post results are", posts);
-
-    setPosts(postsResult ?? null);
+    limit = limit + 5;
+    const postsResult = await fetchPost(limit);
+    if (postsResult) {
+      setPosts(postsResult ?? null);
+    }
   };
 
   return (
@@ -84,6 +86,11 @@ export default function Home() {
               <ActivityIndicator size={20} color={theme.colors.primary} />
             </View>
           }
+          onEndReachedThreshold={0}
+          onEndReached={() => {
+            getPosts();
+            console.log("reached the end");
+          }}
         />
       </ScreenContent>
     </AppScreenContainer>
