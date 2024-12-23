@@ -6,7 +6,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { PostWithUser, userType } from "@/lib/types";
 import { Router } from "expo-router";
 import { User } from "@supabase/supabase-js";
@@ -18,11 +18,17 @@ import useGetUserImage, {
   getSupabaseFileUrl,
 } from "@/app/utils/getUserImage";
 import moment from "moment";
-import { Entypo } from "@expo/vector-icons";
+import {
+  Entypo,
+  Feather,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import PostDetailsScreen from "@/app/(main)/PostDetailsScreen";
 import RenderHTML from "react-native-render-html";
 import { Image } from "expo-image";
 import { ResizeMode, Video } from "expo-av";
+import Icon from "@/assets/icons";
 LogBox.ignoreLogs([
   "Warning: TNodeChildrenRenderer",
   "Warning: MemoizedTNodeRenderer",
@@ -68,6 +74,9 @@ export default function PostCard({
   const openPostDetails = () => {};
   const postTime = moment(item.created_at).format("h:mm A · MMM D, YYYY");
   console.log(item.user.image);
+  const liked = false;
+  const likes = [];
+
   return (
     <View style={[styles.container, hasShadow && shadowStyle]}>
       <View style={styles.header}>
@@ -120,6 +129,35 @@ export default function PostCard({
                 resizeMode={"cover" as ResizeMode}
               />
             ))}
+        </View>
+      </View>
+      <View style={styles.footer}>
+        <View style={styles.footerButton}>
+          <TouchableOpacity style={{}}>
+            <Icon
+              name="heart"
+              size={20}
+              fill={liked ? theme.colors.rose : "transparent"}
+              color={liked ? theme.colors.rose : theme.colors.textLight}
+            />
+          </TouchableOpacity>
+          <Text style={styles.count}>{likes.length}</Text>
+        </View>
+        <View style={styles.footerButton}>
+          <TouchableOpacity style={{}}>
+            <MaterialCommunityIcons
+              name="comment-text-outline"
+              size={20}
+              color="black"
+              fill={"red"}
+            />
+          </TouchableOpacity>
+          <Text style={styles.count}>{likes.length}</Text>
+        </View>
+        <View style={styles.footerButton}>
+          <TouchableOpacity style={{}}>
+            <Ionicons name="share-social-outline" size={24} color="black" />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
