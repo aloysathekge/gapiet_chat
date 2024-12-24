@@ -1,4 +1,5 @@
 import {
+  Alert,
   LogBox,
   StyleSheet,
   Text,
@@ -6,8 +7,8 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import React, { useEffect } from "react";
-import { PostWithUser, userType } from "@/lib/types";
+import React, { useEffect, useState } from "react";
+import { CreateLike, postLikeType, PostWithUser, userType } from "@/lib/types";
 import { Router } from "expo-router";
 import { User } from "@supabase/supabase-js";
 import { theme } from "@/constants/theme";
@@ -29,6 +30,7 @@ import RenderHTML from "react-native-render-html";
 import { Image } from "expo-image";
 import { ResizeMode, Video } from "expo-av";
 import Icon from "@/assets/icons";
+import { createPostLike, removePostLike } from "@/hooks/queries";
 LogBox.ignoreLogs([
   "Warning: TNodeChildrenRenderer",
   "Warning: MemoizedTNodeRenderer",
@@ -74,8 +76,48 @@ export default function PostCard({
   const openPostDetails = () => {};
   const postTime = moment(item.created_at).format("h:mm A · MMM D, YYYY");
   console.log(item.user.image);
-  const liked = false;
-  const likes = [];
+
+  const [likes, setLikes] = useState<postLikeType[]>([]);
+  const [comments, setComments] = useState([]);
+
+  const liked = likes.some((like) => like?.userId === currentUser?.id);
+
+  const onLike = async () => {
+    if (!currentUser?.id) {
+      Alert.alert("Error", "You need to be logged in to like posts.");
+      return;
+    }
+    if (liked) {
+      let updatedLike = likes.filter(
+        (prevLike) => prevLike.userId != currentUser?.id
+      );
+
+      setLikes([...updatedLike]);
+      const result = await removePostLike(item.id, currentUser?.id);
+      console.log("removed like", result);
+    } else {
+      const likeData: CreateLike = {
+        userId: currentUser?.id ?? "",
+        postId: item.id,
+      };
+
+      let result = await createPostLike(likeData);
+      console.log("liked post", result);
+
+      setLikes((prevLikes) => [...prevLikes, result]);
+      if (!result) {
+        Alert.alert("Something went wrong!");
+      }
+    }
+  };
+  useEffect(() => {
+    setLikes(Array.isArray(item?.postLikes) ? item.postLikes : []);
+    console.log(
+      "Likes for post",
+      item?.id,
+      JSON.stringify(item?.postLikes, null, 2)
+    );
+  }, [item]);
 
   return (
     <View style={[styles.container, hasShadow && shadowStyle]}>
@@ -133,7 +175,7 @@ export default function PostCard({
       </View>
       <View style={styles.footer}>
         <View style={styles.footerButton}>
-          <TouchableOpacity style={{}}>
+          <TouchableOpacity onPress={onLike}>
             <Icon
               name="heart"
               size={20}
@@ -152,7 +194,7 @@ export default function PostCard({
               fill={"red"}
             />
           </TouchableOpacity>
-          <Text style={styles.count}>{likes.length}</Text>
+          <Text style={styles.count}>{comments.length}</Text>
         </View>
         <View style={styles.footerButton}>
           <TouchableOpacity style={{}}>

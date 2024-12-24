@@ -1,7 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useSupabase } from "@/providers/supabase-provider";
-import { postType, PostWithUser, userType } from "@/lib/types";
+import {
+  CreateLike,
+  postLikeType,
+  postType,
+  PostWithUser,
+  userType,
+} from "@/lib/types";
 import { uploadFile } from "@/app/utils/getUserImage";
 
 export const useGetUser = (userId: string) => {
@@ -124,15 +130,57 @@ export const fetchPost = async (
   try {
     const { data, error } = await supabase
       .from("posts")
-      .select(`*,user:users(id, name, image)`)
+      .select(`*,user:users(id, name, image),postLikes(*)`)
       .order("created_at", { ascending: false })
       .limit(limit);
 
     if (error) {
       console.log("outer could fetch a post", error);
     }
+
     return data as PostWithUser[];
   } catch (error) {
     console.log("outer could fetch a post", error);
+  }
+};
+
+// createPostLike
+
+export const createPostLike = async (postLike: CreateLike) => {
+  try {
+    const { data, error } = await supabase
+      .from("postLikes")
+      .insert(postLike)
+      .select()
+      .single();
+
+    if (error) {
+      console.log(" could create a post like", error);
+    }
+    return data;
+  } catch (error) {
+    console.log("could not create a post", error);
+  }
+};
+
+// removePost Like
+
+export const removePostLike = async (
+  postId: number,
+  userId: string | undefined
+) => {
+  try {
+    const { error } = await supabase
+      .from("postLikes")
+      .delete()
+      .eq("userId", userId)
+      .eq("postId", postId);
+
+    if (error) {
+      console.log(" could create a post like", error);
+    }
+    return error?.message;
+  } catch (error) {
+    console.log("could not create a post", error);
   }
 };
