@@ -1,6 +1,8 @@
 import {
+  ActivityIndicator,
   Alert,
   LogBox,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,7 +14,7 @@ import { CreateLike, postLikeType, PostWithUser, userType } from "@/lib/types";
 import { Router } from "expo-router";
 import { User } from "@supabase/supabase-js";
 import { theme } from "@/constants/theme";
-import { hp, wp } from "@/helpers/common";
+import { hp, stripHtmlTags, wp } from "@/helpers/common";
 import Avatar from "./Avatar";
 import useGetUserImage, {
   getImageFromUser,
@@ -30,7 +32,7 @@ import RenderHTML from "react-native-render-html";
 import { Image } from "expo-image";
 import { ResizeMode, Video } from "expo-av";
 import Icon from "@/assets/icons";
-import { createPostLike, removePostLike } from "@/hooks/queries";
+import { createPostLike, downloadFile, removePostLike } from "@/hooks/queries";
 LogBox.ignoreLogs([
   "Warning: TNodeChildrenRenderer",
   "Warning: MemoizedTNodeRenderer",
@@ -79,9 +81,20 @@ export default function PostCard({
 
   const [likes, setLikes] = useState<postLikeType[]>([]);
   const [comments, setComments] = useState([]);
+  const [isSharing, setIsSharing] = useState(false);
 
   const liked = likes.some((like) => like?.userId === currentUser?.id);
-
+  const onShare = async () => {
+    setIsSharing(true);
+    const content = {
+      message: stripHtmlTags(item.body),
+      ...(item.file && {
+        url: await downloadFile(getSupabaseFileUrl(item?.file).uri),
+      }),
+    };
+    setIsSharing(false);
+    Share.share(content);
+  };
   const onLike = async () => {
     if (!currentUser?.id) {
       Alert.alert("Error", "You need to be logged in to like posts.");
@@ -197,9 +210,13 @@ export default function PostCard({
           <Text style={styles.count}>{comments.length}</Text>
         </View>
         <View style={styles.footerButton}>
-          <TouchableOpacity style={{}}>
-            <Ionicons name="share-social-outline" size={24} color="black" />
-          </TouchableOpacity>
+          {isSharing ? (
+            <ActivityIndicator />
+          ) : (
+            <TouchableOpacity style={{}} onPress={onShare}>
+              <Ionicons name="share-social-outline" size={24} color="black" />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </View>

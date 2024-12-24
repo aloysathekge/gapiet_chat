@@ -9,6 +9,7 @@ import {
   userType,
 } from "@/lib/types";
 import { uploadFile } from "@/app/utils/getUserImage";
+import * as fileSystem from "expo-file-system";
 
 export const useGetUser = (userId: string) => {
   return useQuery({
@@ -183,4 +184,16 @@ export const removePostLike = async (
   } catch (error) {
     console.log("could not create a post", error);
   }
+};
+
+export const downloadFile = async (url: string) => {
+  try {
+    const { uri } = await fileSystem.downloadAsync(url, getLocalFilePath(url));
+    return uri;
+  } catch (error) {}
+};
+
+export const getLocalFilePath = (filePath: string) => {
+  const fileName = filePath.split("/").pop();
+  return `${fileSystem.documentDirectory}${fileName}`;
 };
