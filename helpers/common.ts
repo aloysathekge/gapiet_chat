@@ -10,3 +10,8 @@ export const wp=(percentage:number)=>{
     return (percentage*deviceWidth)/100
 }
 
+
+export const stripHtmlTags=(html:any)=>{
+    return html.replace(/<[^>]*>?/gm,'')
+}
+
