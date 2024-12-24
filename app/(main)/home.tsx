@@ -24,6 +24,7 @@ export default function Home() {
   const { userProfile: data, user } = useSupabase();
   const { data: ass } = useGetUser(user?.id ?? "");
   const [posts, setPosts] = useState<PostWithUser[] | null>([]);
+  const [hasMore, setHasMore] = useState(true);
   const router = useRouter();
 
   const handlePostEvent = async (payload: any) => {
@@ -51,7 +52,7 @@ export default function Home() {
         handlePostEvent
       )
       .subscribe();
-    getPosts();
+
     return () => {
       supabase.removeChannel(postChannel);
     };
@@ -59,8 +60,11 @@ export default function Home() {
 
   const getPosts = async () => {
     limit = limit + 5;
+    if (!hasMore) return null;
+    console.log("fetch how many post", limit);
     const postsResult = await fetchPost(limit);
     if (postsResult) {
+      if (posts?.length == postsResult.length) setHasMore(false);
       setPosts(postsResult ?? null);
     }
   };
@@ -78,13 +82,19 @@ export default function Home() {
             <PostCard item={item} currentUser={user} router={router} />
           )}
           ListFooterComponent={
-            <View
-              style={{
-                marginVertical: posts !== null && posts.length > 0 ? 30 : 200,
-              }}
-            >
-              <ActivityIndicator size={20} color={theme.colors.primary} />
-            </View>
+            hasMore ? (
+              <View
+                style={{
+                  marginVertical: posts !== null && posts.length > 0 ? 30 : 200,
+                }}
+              >
+                <ActivityIndicator size={20} color={theme.colors.primary} />
+              </View>
+            ) : (
+              <View style={{ marginVertical: 30 }}>
+                <Text style={styles.noPosts}>No more post!</Text>
+              </View>
+            )
           }
           onEndReachedThreshold={0}
           onEndReached={() => {
