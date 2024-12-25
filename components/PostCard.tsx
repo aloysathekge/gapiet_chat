@@ -152,6 +152,7 @@ export default function PostCard({
   };
 
   const openPostDetails = () => {
+    if (!showMoreIcons) return null;
     router.push({
       pathname: "/(main)/PostDetailsScreen",
       params: { postId: item?.id },
