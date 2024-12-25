@@ -9,6 +9,12 @@ export type CreateLike = {
   userId: string;
   postId: number;
 };
+
+export type CreateComment= {
+  postId: number;
+  userId: string;
+  text:string
+};
 export type postLikeType = Database["public"]["Tables"]["postLikes"]["Row"];
 
 export interface PostWithUser extends postType {

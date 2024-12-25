@@ -1,21 +1,25 @@
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { fetchPostDetails } from "@/hooks/queries";
-import { PostWithUser } from "@/lib/types";
+import { createPostComment, fetchPostDetails } from "@/hooks/queries";
+import { CreateComment, PostWithUser } from "@/lib/types";
 import { hp, wp } from "@/helpers/common";
 import { theme } from "@/constants/theme";
 import { AppScreenContainer } from "@/components/AppScreenContainer";
 import PostCard from "@/components/PostCard";
 import { useSupabase } from "@/providers/supabase-provider";
+import AppTextInput from "@/components/AppTextInput";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function PostDetailsScreen() {
   const { postId } = useLocalSearchParams();
@@ -25,6 +29,9 @@ export default function PostDetailsScreen() {
   const { userProfile: data, user } = useSupabase();
 
   const [loadingPost, setLoadingPost] = useState(true);
+  const [postingComment, setPostingComment] = useState(false);
+  const commentRef = useRef("");
+  const inputRef = useRef(null);
 
   useEffect(() => {
     getPostDetails();
@@ -52,6 +59,32 @@ export default function PostDetailsScreen() {
       </View>
     );
   }
+
+  const onNewComment = async () => {
+    //
+    if (!commentRef) return null;
+
+    if (!user?.id) {
+      Alert.alert("Error", "You need to be logged in to like posts.");
+      return;
+    }
+
+    if (post?.id) {
+      let data = {
+        userId: user?.id ?? "",
+        postId: post?.id,
+        text: commentRef.current,
+      };
+      setPostingComment(true);
+      const commentResult = await createPostComment(data);
+      setPostingComment(false);
+
+      if (commentResult) {
+        //Send Notifications
+        console.log("Commented Post", commentResult);
+      }
+    }
+  };
   return (
     <AppScreenContainer>
       <KeyboardAvoidingView
@@ -68,12 +101,41 @@ export default function PostDetailsScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {post && (
-            <PostCard
-              currentUser={user}
-              item={post}
-              router={router}
-              showMoreIcons={false}
-            />
+            <>
+              <PostCard
+                currentUser={user}
+                item={post}
+                router={router}
+                showMoreIcons={false}
+              />
+
+              <View style={styles.inputContainer}>
+                <AppTextInput
+                  inputRef={inputRef}
+                  placeholder="Type a comment"
+                  onChangeText={(value) => (commentRef.current = value)}
+                  containerStyle={{
+                    flex: 1,
+                    height: hp(6.2),
+                    borderRadius: theme.radius.xl,
+                  }}
+                />
+                {postingComment ? (
+                  <ActivityIndicator />
+                ) : (
+                  <TouchableOpacity
+                    style={styles.sendIcon}
+                    onPress={onNewComment}
+                  >
+                    <Ionicons
+                      name="send-outline"
+                      size={24}
+                      color={theme.colors.primary}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </>
           )}
         </ScrollView>
       </KeyboardAvoidingView>

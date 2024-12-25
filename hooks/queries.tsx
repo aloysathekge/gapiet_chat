@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useSupabase } from "@/providers/supabase-provider";
 import {
+  CreateComment,
   CreateLike,
   postLikeType,
   postType,
@@ -216,5 +217,24 @@ export const fetchPostDetails = async (
     return data as PostWithUser;
   } catch (error) {
     console.log("Couldnt fetch a post details", error);
+  }
+};
+
+// create Post comment
+
+export const createPostComment = async (postComment: CreateComment) => {
+  try {
+    const { data, error } = await supabase
+      .from("comments")
+      .insert(postComment)
+      .select()
+      .single();
+
+    if (error) {
+      console.log(" could create a post comment", error);
+    }
+    return data;
+  } catch (error) {
+    console.log("could not create a post comment", error);
   }
 };

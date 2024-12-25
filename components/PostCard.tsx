@@ -237,7 +237,11 @@ export default function PostCard({
           <Text style={styles.count}>{likes.length}</Text>
         </View>
         <View style={styles.footerButton}>
-          <TouchableOpacity style={{}} onPress={openPostDetails}>
+          <TouchableOpacity
+            style={{}}
+            onPress={openPostDetails}
+            disabled={!showMoreIcons}
+          >
             <MaterialCommunityIcons
               name="comment-text-outline"
               size={20}
