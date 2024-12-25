@@ -45,6 +45,7 @@ type postCardProps = {
   router: Router;
   currentUser: User | null;
   hasShadow?: boolean;
+  showMoreIcons?: boolean;
 };
 
 const textStyles = {
@@ -67,6 +68,7 @@ export default function PostCard({
   router,
   currentUser,
   hasShadow = true,
+  showMoreIcons = true,
 }: postCardProps) {
   const shadowStyle: ViewStyle = {
     shadowOffset: {
@@ -77,7 +79,6 @@ export default function PostCard({
     shadowRadius: 6,
     elevation: 1,
   };
-  const openPostDetails = () => {};
   const postTime = moment(item.created_at).format("h:mm A · MMM D, YYYY");
   console.log(item.user.image);
 
@@ -149,6 +150,14 @@ export default function PostCard({
       }
     }
   };
+
+  const openPostDetails = () => {
+    router.push({
+      pathname: "/(main)/PostDetailsScreen",
+      params: { postId: item?.id },
+    });
+  };
+
   useEffect(() => {
     setLikes(Array.isArray(item?.postLikes) ? item.postLikes : []);
     console.log(
@@ -173,13 +182,15 @@ export default function PostCard({
             <Text style={styles.postTime}>{postTime}</Text>
           </View>
         </View>
-        <TouchableOpacity onPress={openPostDetails}>
-          <Entypo
-            name="dots-three-horizontal"
-            size={18}
-            color={theme.colors.text}
-          />
-        </TouchableOpacity>
+        {showMoreIcons && (
+          <TouchableOpacity onPress={openPostDetails}>
+            <Entypo
+              name="dots-three-horizontal"
+              size={18}
+              color={theme.colors.text}
+            />
+          </TouchableOpacity>
+        )}
       </View>
       <View style={styles.content}>
         <View style={styles.postBody}>
@@ -225,7 +236,7 @@ export default function PostCard({
           <Text style={styles.count}>{likes.length}</Text>
         </View>
         <View style={styles.footerButton}>
-          <TouchableOpacity style={{}}>
+          <TouchableOpacity style={{}} onPress={openPostDetails}>
             <MaterialCommunityIcons
               name="comment-text-outline"
               size={20}

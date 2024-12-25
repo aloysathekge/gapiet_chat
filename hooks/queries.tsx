@@ -197,3 +197,24 @@ export const getLocalFilePath = (filePath: string) => {
   const fileName = filePath.split("/").pop();
   return `${fileSystem.documentDirectory}${fileName}`;
 };
+
+// Fetch post details
+export const fetchPostDetails = async (
+  postId: string
+): Promise<PostWithUser | null | undefined> => {
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select(`*,user:users(id, name, image),postLikes(*)`)
+      .eq("id", postId)
+      .single();
+
+    if (error) {
+      console.log("Could not fetch a post details", error);
+    }
+
+    return data as PostWithUser;
+  } catch (error) {
+    console.log("Couldnt fetch a post details", error);
+  }
+};
