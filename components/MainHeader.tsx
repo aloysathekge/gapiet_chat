@@ -6,13 +6,13 @@ import Icon from "@/assets/icons";
 import { useRouter } from "expo-router";
 import Avatar from "./Avatar";
 import { useGetUserImage } from "@/app/utils/getUserImage";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 
 export default function MainHeader() {
   const router = useRouter();
 
   const getUserImage = useGetUserImage();
-
+  const itemCount = 12;
   return (
     <View style={styles.header}>
       <Text style={styles.title}>Gapiet</Text>
@@ -24,7 +24,24 @@ export default function MainHeader() {
             strokeWidth={2}
             color={theme.colors.text}
           />
+          {/* {itemCount > 0 && (
+            <View
+              style={{
+                position: "absolute",
+                right: -6,
+                top: -8,
+                backgroundColor: "red",
+                height: hp(5),
+                borderRadius: 50,
+                paddingHorizontal: 6,
+                paddingVertical: 2,
+              }}
+            >
+              <Text style={{ color: "white", fontSize: 12 }}>{itemCount}</Text>
+            </View>
+          )} */}
         </Pressable>
+
         <Pressable onPress={() => router.push("/newPost")}>
           <Icon
             name="plus"
