@@ -32,6 +32,8 @@ import RenderHTML from "react-native-render-html";
 import { Image } from "expo-image";
 import { ResizeMode, Video } from "expo-av";
 import Icon from "@/assets/icons";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 import { createPostLike, downloadFile, removePostLike } from "@/hooks/queries";
 LogBox.ignoreLogs([
   "Warning: TNodeChildrenRenderer",
@@ -84,17 +86,41 @@ export default function PostCard({
   const [isSharing, setIsSharing] = useState(false);
 
   const liked = likes.some((like) => like?.userId === currentUser?.id);
+
   const onShare = async () => {
-    setIsSharing(true);
-    const content = {
-      message: stripHtmlTags(item.body),
-      ...(item.file && {
-        url: await downloadFile(getSupabaseFileUrl(item?.file).uri),
-      }),
-    };
-    setIsSharing(false);
-    Share.share(content);
+    try {
+      setIsSharing(true);
+
+      if (item.file) {
+        const fileUrl = getSupabaseFileUrl(item.file).uri;
+        console.log("File URL:", fileUrl); // Debug log
+
+        // Fix the directory path - remove duplicate postImages
+        const fileName = item.file || fileUrl.split("/").pop();
+        const localUri = `${FileSystem.documentDirectory}${fileName}`;
+
+        console.log("Downloading to:", localUri); // Debug log
+
+        // Download directly to document directory
+        await FileSystem.downloadAsync(fileUrl, localUri);
+
+        // Share the local file
+        await Sharing.shareAsync(localUri, {
+          mimeType: item.file || "image/png",
+          dialogTitle: stripHtmlTags(item.body),
+        });
+      } else {
+        await Share.share({
+          message: stripHtmlTags(item.body),
+        });
+      }
+    } catch (error) {
+      console.error("Error sharing:", error);
+    } finally {
+      setIsSharing(false);
+    }
   };
+
   const onLike = async () => {
     if (!currentUser?.id) {
       Alert.alert("Error", "You need to be logged in to like posts.");
