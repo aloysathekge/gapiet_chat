@@ -162,10 +162,11 @@ export default function PostCard({
   useEffect(() => {
     setLikes(Array.isArray(item?.postLikes) ? item.postLikes : []);
     console.log(
-      "Likes for post",
+      "post comments are",
       item?.id,
-      JSON.stringify(item?.postLikes, null, 2)
+      JSON.stringify(item.comments, null, 2)
     );
+    //console.log("post comments are ", item.comments);
   }, [item]);
 
   return (
