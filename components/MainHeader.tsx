@@ -6,6 +6,7 @@ import Icon from "@/assets/icons";
 import { useRouter } from "expo-router";
 import Avatar from "./Avatar";
 import { useGetUserImage } from "@/app/utils/getUserImage";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function MainHeader() {
   const router = useRouter();
@@ -17,8 +18,8 @@ export default function MainHeader() {
       <Text style={styles.title}>Gapiet</Text>
       <View style={styles.icons}>
         <Pressable onPress={() => router.push("/notifications")}>
-          <Icon
-            name="heart"
+          <Ionicons
+            name="notifications-outline"
             size={hp(3.2)}
             strokeWidth={2}
             color={theme.colors.text}
