@@ -11,7 +11,11 @@ import {
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { createPostComment, fetchPostDetails } from "@/hooks/queries";
+import {
+  createPostComment,
+  fetchPostDetails,
+  removePostComment,
+} from "@/hooks/queries";
 import { commentWithUser, CreateComment, PostWithUser } from "@/lib/types";
 import { hp, wp } from "@/helpers/common";
 import { theme } from "@/constants/theme";
@@ -34,6 +38,8 @@ export default function PostDetailsScreen() {
 
   const [loadingPost, setLoadingPost] = useState(true);
   const [postingComment, setPostingComment] = useState(false);
+  const [deletingComment, setDeletingComment] = useState(false);
+
   const [comment, setComment] = useState("");
 
   const inputRef = useRef<TextInput>(null);
@@ -93,6 +99,25 @@ export default function PostDetailsScreen() {
       }
     }
   };
+
+  const deleteComment = async (comment: commentWithUser) => {
+    setDeletingComment(true);
+    try {
+      await removePostComment(comment.id);
+
+      setPost((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          comments: prev.comments.filter((com) => com.id !== comment.id),
+        };
+      });
+    } catch (error) {
+      Alert.alert("Error deleting comment");
+    } finally {
+      setDeletingComment(false);
+    }
+  };
   return (
     <AppScreenContainer>
       <KeyboardAvoidingView
@@ -146,12 +171,14 @@ export default function PostDetailsScreen() {
               <View style={{ marginVertical: 15, gap: 17 }}>
                 {post.comments.map((comment) => (
                   <CommentItem
+                    deleting={deletingComment}
                     canDelete={
                       currentUser?.id == comment.userId ||
                       currentUser?.id == post.userId
                     }
                     key={comment.id.toString()}
                     item={comment as commentWithUser}
+                    onDelete={deleteComment}
                   />
                 ))}
 

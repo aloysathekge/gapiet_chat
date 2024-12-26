@@ -1,4 +1,11 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import { commentsType, commentWithUser } from "@/lib/types";
 import { formatTime, hp } from "@/helpers/common";
@@ -9,8 +16,33 @@ import Icon from "@/assets/icons";
 type commentItemProp = {
   item: commentWithUser;
   canDelete: boolean;
+  onDelete: (item: commentWithUser) => void;
+  deleting: boolean;
 };
-export default function CommentItem({ item, canDelete }: commentItemProp) {
+export default function CommentItem({
+  item,
+  canDelete,
+  onDelete,
+  deleting,
+}: commentItemProp) {
+  const handleDeleteComment = () => {
+    Alert.alert("Confirm", "are you sure you want to delete comment?", [
+      {
+        text: "Cancel",
+        onPress: () => {
+          console.log("Cancelled to delete comment");
+        },
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        onPress: () => {
+          onDelete(item);
+        },
+        style: "destructive",
+      },
+    ]);
+  };
   return (
     <View style={styles.container}>
       <Avatar
@@ -34,8 +66,12 @@ export default function CommentItem({ item, canDelete }: commentItemProp) {
             </Text>
           </View>
           {canDelete && (
-            <TouchableOpacity>
-              <Icon name="delete" color={theme.colors.rose} size={20} />
+            <TouchableOpacity onPress={handleDeleteComment}>
+              {deleting ? (
+                <ActivityIndicator />
+              ) : (
+                <Icon name="delete" color={theme.colors.rose} size={20} />
+              )}
             </TouchableOpacity>
           )}
         </View>

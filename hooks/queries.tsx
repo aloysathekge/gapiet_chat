@@ -241,3 +241,18 @@ export const createPostComment = async (postComment: CreateComment) => {
     console.log("could not create a post comment", error);
   }
 };
+
+export const removePostComment = async (commentId: number) => {
+  try {
+    const { error } = await supabase
+      .from("comments")
+      .delete()
+      .eq("id", commentId);
+
+    if (error) {
+      console.log(" could delete a post comment", error);
+    }
+  } catch (error) {
+    console.log("could not delete  a post comment", error);
+  }
+};
