@@ -25,6 +25,9 @@ export interface PostWithUser extends postType {
   comments:commentsType[]
 }
 
+export interface commentWithUser extends commentsType{
+  user:userType
+}
 
 
 export type fileType={
