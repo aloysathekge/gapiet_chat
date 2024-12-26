@@ -14,7 +14,9 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   createPostComment,
   fetchPostDetails,
+  fetchUserData,
   removePostComment,
+  useGetUser,
 } from "@/hooks/queries";
 import { commentWithUser, CreateComment, PostWithUser } from "@/lib/types";
 import { hp, wp } from "@/helpers/common";
@@ -26,6 +28,7 @@ import AppTextInput from "@/components/AppTextInput";
 import { Ionicons } from "@expo/vector-icons";
 import { TextInput } from "react-native-gesture-handler";
 import CommentItem from "@/components/CommentItem";
+import { supabase } from "@/lib/supabase";
 
 export default function PostDetailsScreen() {
   const { postId } = useLocalSearchParams();
@@ -39,13 +42,45 @@ export default function PostDetailsScreen() {
   const [loadingPost, setLoadingPost] = useState(true);
   const [postingComment, setPostingComment] = useState(false);
   const [deletingComment, setDeletingComment] = useState(false);
-
+  const { data: userData } = useGetUser(post?.userId ?? "");
   const [comment, setComment] = useState("");
+  const [deletingId, setDeletingId] = useState<Number | null>();
 
   const inputRef = useRef<TextInput>(null);
 
+  const handleNewComment = async (payload: any) => {
+    console.log("realtime comment", payload.new);
+    if (payload.new) {
+      const newComment = { ...payload.new };
+      const res = await fetchUserData(newComment.userId);
+      console.log("What am getting from fetch  user,", res);
+
+      newComment.user = res;
+      setPost((prevPost) => {
+        if (!prevPost) return null;
+        return { ...prevPost, comments: [newComment, ...prevPost?.comments] };
+      });
+    }
+  };
+
   useEffect(() => {
+    const commentChannel = supabase
+      .channel("comments")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "comments",
+          filter: `postId=eq.${postId}`,
+        },
+        handleNewComment
+      )
+      .subscribe();
     getPostDetails();
+    return () => {
+      supabase.removeChannel(commentChannel);
+    };
   }, []);
 
   const getPostDetails = async () => {
@@ -101,6 +136,7 @@ export default function PostDetailsScreen() {
   };
 
   const deleteComment = async (comment: commentWithUser) => {
+    setDeletingId(comment.id);
     setDeletingComment(true);
     try {
       await removePostComment(comment.id);
@@ -116,6 +152,7 @@ export default function PostDetailsScreen() {
       Alert.alert("Error deleting comment");
     } finally {
       setDeletingComment(false);
+      setDeletingId(null);
     }
   };
   return (
@@ -171,7 +208,7 @@ export default function PostDetailsScreen() {
               <View style={{ marginVertical: 15, gap: 17 }}>
                 {post.comments.map((comment) => (
                   <CommentItem
-                    deleting={deletingComment}
+                    deleting={deletingId == comment.id}
                     canDelete={
                       currentUser?.id == comment.userId ||
                       currentUser?.id == post.userId
