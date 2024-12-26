@@ -20,6 +20,7 @@ import PostCard from "@/components/PostCard";
 import { useSupabase } from "@/providers/supabase-provider";
 import AppTextInput from "@/components/AppTextInput";
 import { Ionicons } from "@expo/vector-icons";
+import { TextInput } from "react-native-gesture-handler";
 
 export default function PostDetailsScreen() {
   const { postId } = useLocalSearchParams();
@@ -30,8 +31,9 @@ export default function PostDetailsScreen() {
 
   const [loadingPost, setLoadingPost] = useState(true);
   const [postingComment, setPostingComment] = useState(false);
+  const [comment, setComment] = useState("");
   const commentRef = useRef("");
-  const inputRef = useRef(null);
+  const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     getPostDetails();
@@ -61,8 +63,7 @@ export default function PostDetailsScreen() {
   }
 
   const onNewComment = async () => {
-    //
-    if (!commentRef) return null;
+    if (!comment.trim()) return;
 
     if (!user?.id) {
       Alert.alert("Error", "You need to be logged in to like posts.");
@@ -73,7 +74,7 @@ export default function PostDetailsScreen() {
       let data = {
         userId: user?.id ?? "",
         postId: post?.id,
-        text: commentRef.current,
+        text: comment,
       };
       setPostingComment(true);
       const commentResult = await createPostComment(data);
@@ -82,6 +83,10 @@ export default function PostDetailsScreen() {
       if (commentResult) {
         //Send Notifications
         console.log("Commented Post", commentResult);
+        setComment("");
+        if (inputRef.current) {
+          inputRef.current.clear(); // Also clear the native input
+        }
       }
     }
   };
@@ -113,7 +118,7 @@ export default function PostDetailsScreen() {
                 <AppTextInput
                   inputRef={inputRef}
                   placeholder="Type a comment"
-                  onChangeText={(value) => (commentRef.current = value)}
+                  onChangeText={setComment}
                   containerStyle={{
                     flex: 1,
                     height: hp(6.2),

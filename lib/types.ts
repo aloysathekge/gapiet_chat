@@ -22,7 +22,7 @@ export type postLikeType = Database["public"]["Tables"]["postLikes"]["Row"];
 export interface PostWithUser extends postType {
   user: userType;
   postLikes:postLikeType[]
-  comments:commentsType
+  comments:commentsType[]
 }
 
 

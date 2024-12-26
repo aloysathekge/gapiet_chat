@@ -10,7 +10,13 @@ import {
   ViewStyle,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { CreateLike, postLikeType, PostWithUser, userType } from "@/lib/types";
+import {
+  commentsType,
+  CreateLike,
+  postLikeType,
+  PostWithUser,
+  userType,
+} from "@/lib/types";
 import { Router } from "expo-router";
 import { User } from "@supabase/supabase-js";
 import { theme } from "@/constants/theme";
@@ -83,7 +89,7 @@ export default function PostCard({
   console.log(item.user.image);
 
   const [likes, setLikes] = useState<postLikeType[]>([]);
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState<commentsType[]>([]);
   const [isSharing, setIsSharing] = useState(false);
 
   const liked = likes.some((like) => like?.userId === currentUser?.id);
@@ -161,14 +167,9 @@ export default function PostCard({
 
   useEffect(() => {
     setLikes(Array.isArray(item?.postLikes) ? item.postLikes : []);
-    console.log(
-      "post comments are",
-      item?.id,
-      JSON.stringify(item.comments, null, 2)
-    );
-    //console.log("post comments are ", item.comments);
+    setComments(item?.comments);
   }, [item]);
-
+  console.log("Comments useState is working", comments);
   return (
     <View style={[styles.container, hasShadow && shadowStyle]}>
       <View style={styles.header}>

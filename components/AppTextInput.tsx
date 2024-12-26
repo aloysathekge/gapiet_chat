@@ -9,7 +9,6 @@ import {
 import React from "react";
 import { hp } from "@/helpers/common";
 import { theme } from "@/constants/theme";
-import Icon from "@/assets/icons";
 
 type appTextInputProps = TextInputProps & {
   containerStyle?: ViewStyle;
