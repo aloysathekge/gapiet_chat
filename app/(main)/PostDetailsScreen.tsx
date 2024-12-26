@@ -12,7 +12,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { createPostComment, fetchPostDetails } from "@/hooks/queries";
-import { CreateComment, PostWithUser } from "@/lib/types";
+import { commentWithUser, CreateComment, PostWithUser } from "@/lib/types";
 import { hp, wp } from "@/helpers/common";
 import { theme } from "@/constants/theme";
 import { AppScreenContainer } from "@/components/AppScreenContainer";
@@ -21,10 +21,13 @@ import { useSupabase } from "@/providers/supabase-provider";
 import AppTextInput from "@/components/AppTextInput";
 import { Ionicons } from "@expo/vector-icons";
 import { TextInput } from "react-native-gesture-handler";
+import CommentItem from "@/components/CommentItem";
 
 export default function PostDetailsScreen() {
   const { postId } = useLocalSearchParams();
-  console.log("Opened post with id ", postId);
+  const { user: currentUser } = useSupabase();
+
+  // console.log("Opened post with id ", postId);
   const [post, setPost] = useState<PostWithUser | null>(null);
   const router = useRouter();
   const { userProfile: data, user } = useSupabase();
@@ -32,7 +35,7 @@ export default function PostDetailsScreen() {
   const [loadingPost, setLoadingPost] = useState(true);
   const [postingComment, setPostingComment] = useState(false);
   const [comment, setComment] = useState("");
-  const commentRef = useRef("");
+
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -105,7 +108,7 @@ export default function PostDetailsScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {post && (
+          {post ? (
             <>
               <PostCard
                 currentUser={user}
@@ -140,7 +143,36 @@ export default function PostDetailsScreen() {
                   </TouchableOpacity>
                 )}
               </View>
+              <View style={{ marginVertical: 15, gap: 17 }}>
+                {post.comments.map((comment) => (
+                  <CommentItem
+                    canDelete={
+                      currentUser?.id == comment.userId ||
+                      currentUser?.id == post.userId
+                    }
+                    key={comment.id.toString()}
+                    item={comment as commentWithUser}
+                  />
+                ))}
+
+                {post.comments.length == 0 && (
+                  <Text style={{ color: theme.colors.text, marginLeft: 5 }}>
+                    be the first to comment
+                  </Text>
+                )}
+              </View>
             </>
+          ) : (
+            <View
+              style={[
+                styles.center,
+                { justifyContent: "flex-start", marginTop: 100 },
+              ]}
+            >
+              <Text style={styles.notFound}>
+                Post not found! must have been deleted
+              </Text>
+            </View>
           )}
         </ScrollView>
       </KeyboardAvoidingView>

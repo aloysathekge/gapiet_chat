@@ -6,7 +6,6 @@ import { theme } from "@/constants/theme";
 import Avatar from "./Avatar";
 import { getImageFromUser } from "@/app/utils/getUserImage";
 import Icon from "@/assets/icons";
-import { useSupabase } from "@/providers/supabase-provider";
 type commentItemProp = {
   item: commentWithUser;
   canDelete: boolean;

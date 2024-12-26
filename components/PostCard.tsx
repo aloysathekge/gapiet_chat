@@ -20,7 +20,7 @@ import {
 import { Router } from "expo-router";
 import { User } from "@supabase/supabase-js";
 import { theme } from "@/constants/theme";
-import { hp, stripHtmlTags, wp } from "@/helpers/common";
+import { formatTime, hp, stripHtmlTags, wp } from "@/helpers/common";
 import Avatar from "./Avatar";
 import useGetUserImage, {
   getImageFromUser,
@@ -182,7 +182,7 @@ export default function PostCard({
           />
           <View style={{ gap: 2 }}>
             <Text style={styles.username}>{item.user.name}</Text>
-            <Text style={styles.postTime}>{postTime}</Text>
+            <Text style={styles.postTime}>{formatTime(item.created_at)}</Text>
           </View>
         </View>
         {showMoreIcons && (
