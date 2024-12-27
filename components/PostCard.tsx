@@ -52,6 +52,9 @@ type postCardProps = {
   currentUser: User | null;
   hasShadow?: boolean;
   showMoreIcons?: boolean;
+  showDelete: boolean;
+  onEdit: (item: PostWithUser) => void;
+  onDelete: (item: PostWithUser) => void;
 };
 
 const textStyles = {
@@ -75,6 +78,9 @@ export default function PostCard({
   currentUser,
   hasShadow = true,
   showMoreIcons = true,
+  showDelete,
+  onDelete,
+  onEdit,
 }: postCardProps) {
   const shadowStyle: ViewStyle = {
     shadowOffset: {
@@ -165,6 +171,19 @@ export default function PostCard({
     });
   };
 
+  const confirmDeletePost = () => [
+    Alert.alert("Confirm", "Are you you wnat to delete?", [
+      {
+        text: "Cancel",
+        onPress: () => console.log("cancelled delete"),
+      },
+      {
+        text: "Delete",
+        onPress: () => onDelete(item),
+      },
+    ]),
+  ];
+
   useEffect(() => {
     setLikes(Array.isArray(item?.postLikes) ? item.postLikes : []);
     setComments(item?.comments);
@@ -193,6 +212,17 @@ export default function PostCard({
               color={theme.colors.text}
             />
           </TouchableOpacity>
+        )}
+
+        {showDelete && currentUser?.id == item?.userId && (
+          <View style={styles.actions}>
+            <TouchableOpacity onPress={() => onEdit(item)}>
+              <Feather name="edit-3" size={hp(3)} color={theme.colors.text} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={confirmDeletePost}>
+              <Icon name="delete" color={theme.colors.rose} size={hp(3)} />
+            </TouchableOpacity>
+          </View>
         )}
       </View>
       <View style={styles.content}>
