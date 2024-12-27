@@ -171,7 +171,7 @@ export default function PostCard({
     });
   };
 
-  const confirmDeletePost = () => [
+  const confirmDeletePost = () => {
     Alert.alert("Confirm", "Are you you wnat to delete?", [
       {
         text: "Cancel",
@@ -181,8 +181,8 @@ export default function PostCard({
         text: "Delete",
         onPress: () => onDelete(item),
       },
-    ]),
-  ];
+    ]);
+  };
 
   useEffect(() => {
     setLikes(Array.isArray(item?.postLikes) ? item.postLikes : []);

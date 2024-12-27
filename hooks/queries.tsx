@@ -256,3 +256,19 @@ export const removePostComment = async (commentId: number) => {
     console.log("could not delete  a post comment", error);
   }
 };
+
+export const removePost = async (postId: number) => {
+  try {
+    const { error, data } = await supabase
+      .from("posts")
+      .delete()
+      .eq("id", postId);
+
+    if (error) {
+      console.log(" could delete a post ", error);
+    }
+    return data;
+  } catch (error) {
+    console.log("could not delete  a post", error);
+  }
+};

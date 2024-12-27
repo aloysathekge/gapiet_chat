@@ -68,6 +68,16 @@ export default function Home() {
       setPosts(postsResult ?? null);
     }
   };
+  const onEditPost = async (item: any) => {
+    // Edit Post
+    console.log("Delete post", item);
+  };
+
+  const onDeletePost = async (item: any) => {
+    // Delete Post
+
+    console.log("Delete post", item);
+  };
 
   return (
     <AppScreenContainer containerStyle={{ backgroundColor: "#fff" }}>
@@ -79,7 +89,14 @@ export default function Home() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listStyle}
           renderItem={({ item }) => (
-            <PostCard item={item} currentUser={user} router={router} />
+            <PostCard
+              item={item}
+              currentUser={user}
+              router={router}
+              onDelete={onEditPost}
+              onEdit={onDeletePost}
+              showDelete={false}
+            />
           )}
           ListFooterComponent={
             hasMore ? (

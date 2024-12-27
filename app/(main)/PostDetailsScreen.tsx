@@ -1,6 +1,7 @@
 import {
   ActivityIndicator,
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -15,6 +16,7 @@ import {
   createPostComment,
   fetchPostDetails,
   fetchUserData,
+  removePost,
   removePostComment,
   useGetUser,
 } from "@/hooks/queries";
@@ -49,6 +51,7 @@ export default function PostDetailsScreen() {
   const inputRef = useRef<TextInput>(null);
 
   const handleNewComment = async (payload: any) => {
+    Keyboard.dismiss();
     console.log("realtime comment", payload.new);
     if (payload.new) {
       const newComment = { ...payload.new };
@@ -155,6 +158,20 @@ export default function PostDetailsScreen() {
       setDeletingId(null);
     }
   };
+
+  const onEditPost = async (item: any) => {
+    // Edit Post
+
+    router.push({ pathname: "/(main)/newPost", params: item });
+    console.log("Edit post", item);
+  };
+
+  const onDeletePost = async (item: PostWithUser) => {
+    await removePost(item?.id);
+    router.back();
+
+    console.log("Delete post");
+  };
   return (
     <AppScreenContainer>
       <KeyboardAvoidingView
@@ -177,6 +194,9 @@ export default function PostDetailsScreen() {
                 item={post}
                 router={router}
                 showMoreIcons={false}
+                showDelete={true}
+                onEdit={onEditPost}
+                onDelete={onDeletePost}
               />
 
               <View style={styles.inputContainer}>

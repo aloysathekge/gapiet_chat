@@ -19,7 +19,7 @@ import Avatar from "@/components/Avatar";
 import { useSupabase } from "@/providers/supabase-provider";
 import useGetUserImage, { getSupabaseFileUrl } from "../utils/getUserImage";
 import RichTextEditor from "@/components/RichTextEditor";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { RichEditor } from "react-native-pell-rich-editor";
 import Icon from "@/assets/icons";
 import { AppButton } from "@/components/AppButton";
@@ -32,7 +32,22 @@ type MediaFile = ImagePicker.ImagePickerAsset | string;
 export default function NewPost() {
   const { userProfile: user } = useSupabase();
   const getUserImage = useGetUserImage();
+  const post = useLocalSearchParams<PostParams>();
+  const isEditing = !!post.id;
 
+  type PostParams = {
+    id?: string;
+    body?: string;
+    file?: string;
+  };
+  interface PostData {
+    file: ImagePicker.ImagePickerAsset | string | null;
+    body: string;
+    userId: string | undefined;
+    id?: string; // Keep this as string since we'll convert array if needed
+  }
+
+  console.log("post to edit is ", post);
   //Post media
   const [image, setImage] = useState<string | null>(null);
 
@@ -40,9 +55,31 @@ export default function NewPost() {
   const editorRef = useRef<RichEditor>(null);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [file, setFile] = useState<ImagePicker.ImagePickerAsset | null>(null);
+  const [file, setFile] = useState<
+    ImagePicker.ImagePickerAsset | string | null
+  >(null);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [bodyText, setBodyText] = useState("");
+
+  useEffect(() => {
+    if (isEditing) {
+      // Initialize editor with existing post content
+      if (post.body) {
+        bodyRef.current = post.body;
+        setBodyText(post.body);
+
+        setTimeout(() => {
+          editorRef.current?.setContentHTML(post.body ?? "");
+        }, 300);
+      }
+    }
+
+    // Initialize media if exists
+    if (post.file) {
+      const fileContent = Array.isArray(post.file) ? post.file[0] : post.file;
+      setFile(fileContent);
+    }
+  }, [post.id, isEditing]);
 
   useEffect(() => {
     console.log("File:", file);
@@ -85,11 +122,15 @@ export default function NewPost() {
       Alert.alert("Please post a media or text");
     }
 
-    let data = {
+    let data: PostData = {
       file,
       body: bodyRef.current,
       userId: user?.id,
     };
+    if (post && post.id) {
+      const postId = Array.isArray(post.id) ? post.id[0] : post.id;
+      data.id = postId;
+    }
     setLoading(true);
     console.log("data passed in here are", data);
     const res = await createUpdatePost(data);
@@ -168,7 +209,7 @@ export default function NewPost() {
               editorRef={editorRef}
               onChange={(body) => {
                 bodyRef.current = body;
-                setBodyText(body);
+                // setBodyText(body);
               }}
             />
           </View>
@@ -209,7 +250,7 @@ export default function NewPost() {
           </View>
         </ScrollView>
         <AppButton
-          label="Post"
+          label={post && post.id ? "Update" : "Post"}
           onPress={onSubmit}
           disabled={!isButtonEnabled}
           loading={loading}
