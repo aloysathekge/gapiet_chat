@@ -60,18 +60,19 @@ export default function NewPost() {
   >(null);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [bodyText, setBodyText] = useState("");
+  const [editorReady, setEditorReady] = useState(false);
 
   useEffect(() => {
-    if (isEditing) {
-      // Initialize editor with existing post content
-      if (post.body) {
-        bodyRef.current = post.body;
-        setBodyText(post.body);
+    console.log("Effect running, editor ready:", editorReady);
+    console.log("Post body:", post.body);
 
-        setTimeout(() => {
-          editorRef.current?.setContentHTML(post.body ?? "");
-        }, 300);
-      }
+    if (isEditing && post.body && editorReady) {
+      console.log("Setting editor content");
+      bodyRef.current = post.body;
+      console.log("Current editor content", bodyRef.current);
+
+      setBodyText(post.body);
+      editorRef.current?.setContentHTML(post.body);
     }
 
     // Initialize media if exists
@@ -79,7 +80,7 @@ export default function NewPost() {
       const fileContent = Array.isArray(post.file) ? post.file[0] : post.file;
       setFile(fileContent);
     }
-  }, [post.id, isEditing]);
+  }, [post.id, isEditing, editorReady]);
 
   useEffect(() => {
     console.log("File:", file);
@@ -210,6 +211,10 @@ export default function NewPost() {
               onChange={(body) => {
                 bodyRef.current = body;
                 // setBodyText(body);
+              }}
+              onInit={() => {
+                console.log("Editor loaded!");
+                setEditorReady(true);
               }}
             />
           </View>

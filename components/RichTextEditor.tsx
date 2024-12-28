@@ -7,14 +7,17 @@ import {
 } from "react-native-pell-rich-editor";
 import { theme } from "@/constants/theme";
 
-type richEditorProps = {
+type RichTextEditorProps = {
   editorRef: any;
   onChange: (content: string) => void;
+  onInit?: () => void;
 };
+
 export default function RichTextEditor({
   editorRef,
   onChange,
-}: richEditorProps) {
+  onInit,
+}: RichTextEditorProps) {
   return (
     <View style={{ minHeight: 250 }}>
       <RichToolbar
@@ -50,6 +53,7 @@ export default function RichTextEditor({
         editorStyle={styles.contentStyle}
         onChange={onChange}
         placeholder="Write out your mind"
+        onLoadEnd={onInit}
       />
     </View>
   );
