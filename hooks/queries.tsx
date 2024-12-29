@@ -127,24 +127,42 @@ export const createUpdatePost = async (post: any) => {
 };
 
 export const fetchPost = async (
-  limit: number
+  limit: number,
+  userId?: string
 ): Promise<PostWithUser[] | null | undefined> => {
   try {
-    const { data, error } = await supabase
-      .from("posts")
-      .select(`*,user:users(id, name, image),postLikes(*),comments(*)`)
-      .order("created_at", { ascending: false })
-      .limit(limit);
+    if (userId) {
+      const { data, error } = await supabase
+        .from("posts")
+        .select(`*,user:users(id, name, image),postLikes(*),comments(*)`)
+        .order("created_at", { ascending: false })
+        .eq("userId", userId)
+        .limit(limit);
 
-    if (error) {
-      console.log("outer could fetch a post", error);
+      if (error) {
+        console.log("outer could fetch a post", error);
+      }
+
+      return data as PostWithUser[];
+    } else {
+      const { data, error } = await supabase
+        .from("posts")
+        .select(`*,user:users(id, name, image),postLikes(*),comments(*)`)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        console.log("outer could fetch a post", error);
+      }
+
+      return data as PostWithUser[];
     }
-
-    return data as PostWithUser[];
   } catch (error) {
     console.log("outer could fetch a post", error);
   }
 };
+
+//fetch for specific user
 
 // createPostLike
 

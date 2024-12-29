@@ -1,31 +1,58 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import React, { useState } from "react";
 import { AppScreenContainer } from "@/components/AppScreenContainer";
 import UserHeader from "@/components/UserHeader";
 import { useRouter } from "expo-router";
 import { useSignOut, useSupabase } from "@/providers/supabase-provider";
 import { ScreenContent } from "@/components/ScreenContent";
 import Avatar from "@/components/Avatar";
-import { hp } from "@/helpers/common";
+import { hp, wp } from "@/helpers/common";
 import { theme } from "@/constants/theme";
 import useGetUserImage from "../utils/getUserImage";
 import Icon from "@/assets/icons";
 import { Feather } from "@expo/vector-icons";
 import { AppButton } from "@/components/AppButton";
+import { PostWithUser } from "@/lib/types";
+import { fetchPost, useGetUser } from "@/hooks/queries";
+import PostCard from "@/components/PostCard";
 
 export default function Profile() {
   const router = useRouter();
-  const { userProfile: user, isLoading } = useSupabase();
-  const { error, isError, isLoading: isSigningOut, signOut } = useSignOut();
+  const { user: currentUser, userProfile: user } = useSupabase();
 
+  const { error, isError, isLoading: isSigningOut, signOut } = useSignOut();
+  const [posts, setPosts] = useState<PostWithUser[] | null>([]);
+  const [hasMore, setHasMore] = useState(true);
+
+  let limit = 0;
   const getUserImage = useGetUserImage();
-  return (
-    <AppScreenContainer>
-      <UserHeader router={router} user={user!} />
-      <ScreenContent
-        style={{ padding: theme.Units.medium }}
-        loading={isLoading}
-      >
+
+  const getPosts = async () => {
+    limit = limit + 5;
+    if (!hasMore) return null;
+    console.log("fetch how many post", limit);
+    const postsResult = await fetchPost(limit, user?.id);
+    if (postsResult) {
+      if (posts?.length == postsResult.length) setHasMore(false);
+      setPosts(postsResult ?? null);
+    }
+  };
+
+  const RenderHeader = () => {
+    return (
+      <View style={{ padding: theme.Units.medium }}>
+        <UserHeader
+          router={router}
+          user={user!}
+          style={{ backgroundColor: "" }}
+        />
         <View style={{ alignSelf: "center", height: hp(12), width: hp(12) }}>
           <Avatar
             uri={getUserImage()}
@@ -69,7 +96,61 @@ export default function Profile() {
         </View>
         {/* this will be move to somewhere appropriate */}
         <AppButton label="logout" onPress={signOut} loading={isSigningOut} />
-      </ScreenContent>
+      </View>
+    );
+  };
+
+  const onEditPost = async (item: any) => {
+    // Edit Post
+    console.log("Delete post", item);
+  };
+
+  const onDeletePost = async (item: any) => {
+    // Delete Post
+
+    console.log("Delete post", item);
+  };
+
+  return (
+    <AppScreenContainer>
+      <FlatList
+        keyExtractor={(item: PostWithUser) => item.id.toString()}
+        data={posts}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listStyle}
+        renderItem={({ item }) => (
+          <PostCard
+            item={item}
+            currentUser={currentUser}
+            router={router}
+            onDelete={onEditPost}
+            onEdit={onDeletePost}
+            showDelete={false}
+          />
+        )}
+        ListFooterComponent={
+          hasMore ? (
+            <View
+              style={{
+                marginVertical: posts !== null && posts.length > 0 ? 30 : 200,
+              }}
+            >
+              <ActivityIndicator size={20} color={theme.colors.primary} />
+            </View>
+          ) : (
+            <View style={{ marginVertical: 30 }}>
+              <Text style={styles.noPosts}>No more post!</Text>
+            </View>
+          )
+        }
+        onEndReachedThreshold={0}
+        onEndReached={() => {
+          getPosts();
+          console.log("reached the end");
+        }}
+      />
+
+      <RenderHeader />
     </AppScreenContainer>
   );
 }
@@ -104,5 +185,35 @@ const styles = StyleSheet.create({
     fontSize: hp(1.6),
     fontWeight: "500",
     color: theme.colors.textLight,
+  },
+  icons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 18,
+  },
+  listStyle: {
+    paddingTop: 20,
+    paddingHorizontal: wp(4),
+  },
+  noPosts: {
+    fontSize: hp(2),
+    textAlign: "center",
+    color: theme.colors.text,
+  },
+  avatarImage: {
+    borderColor: theme.colors.gray,
+    borderWidth: 3,
+  },
+  pill: {
+    position: "absolute",
+    right: -10,
+    top: -4,
+    height: hp(2.2),
+    width: hp(2.2),
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    backgroundColor: theme.colors.roseLight,
   },
 });

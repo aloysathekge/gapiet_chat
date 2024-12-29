@@ -1,4 +1,10 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
 import React from "react";
 import { Router } from "expo-router";
 import { userType } from "@/lib/types";
@@ -10,16 +16,20 @@ import { FontAwesome } from "@expo/vector-icons";
 type UserHeaderProps = {
   router: Router;
   user: userType;
+  style?: ViewStyle;
 };
-export default function UserHeader({ router, user }: UserHeaderProps) {
+export default function UserHeader({ router, user, style }: UserHeaderProps) {
   return (
     <View
-      style={{
-        flexDirection: "row",
+      style={[
+        {
+          flexDirection: "row",
 
-        backgroundColor: "#fff",
-        paddingHorizontal: wp(4),
-      }}
+          backgroundColor: "#fff",
+          paddingHorizontal: wp(4),
+        },
+        style,
+      ]}
     >
       <View style={{ flex: 1 }}>
         <AppHeader title="Profile" showBackButton={true} mB={30} />
