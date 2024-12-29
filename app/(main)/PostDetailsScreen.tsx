@@ -31,15 +31,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { TextInput } from "react-native-gesture-handler";
 import CommentItem from "@/components/CommentItem";
 import { supabase } from "@/lib/supabase";
+import { createNotification } from "@/hooks/notifications";
 
 export default function PostDetailsScreen() {
   const { postId } = useLocalSearchParams();
-  const { user: currentUser } = useSupabase();
+  // const { user: currentUser } = useSupabase();
 
   // console.log("Opened post with id ", postId);
   const [post, setPost] = useState<PostWithUser | null>(null);
   const router = useRouter();
-  const { userProfile: data, user } = useSupabase();
+  const { user } = useSupabase();
 
   const [loadingPost, setLoadingPost] = useState(true);
   const [postingComment, setPostingComment] = useState(false);
@@ -128,7 +129,19 @@ export default function PostDetailsScreen() {
       setPostingComment(false);
 
       if (commentResult) {
-        //Send Notifications
+        if (post.userId != user.id) {
+          //Send Notifications
+          let notifyData = {
+            senderId: user.id,
+            receiverId: post.userId,
+            title: "Comment on your post",
+            data: JSON.stringify({
+              postId: post.id,
+              commentId: commentResult?.id,
+            }),
+          };
+          createNotification(notifyData);
+        }
         console.log("Commented Post", commentResult);
         setComment("");
         if (inputRef.current) {
@@ -230,8 +243,7 @@ export default function PostDetailsScreen() {
                   <CommentItem
                     deleting={deletingId == comment.id}
                     canDelete={
-                      currentUser?.id == comment.userId ||
-                      currentUser?.id == post.userId
+                      user?.id == comment.userId || user?.id == post.userId
                     }
                     key={comment.id.toString()}
                     item={comment as commentWithUser}
