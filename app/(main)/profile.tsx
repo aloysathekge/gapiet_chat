@@ -118,6 +118,7 @@ export default function Profile() {
             {user?.bio && <Text>{user?.bio ?? ""}</Text>}
           </View>
           {/* this will be move to somewhere appropriate */}
+          <AppButton label="logout" onPress={signOut} loading={isSigningOut} />
         </View>
       </>
     );
