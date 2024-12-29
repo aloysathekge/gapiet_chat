@@ -17,7 +17,7 @@ export default function MainHeader() {
     <View style={styles.header}>
       <Text style={styles.title}>Gapiet</Text>
       <View style={styles.icons}>
-        <Pressable onPress={() => router.push("/notifications")}>
+        <Pressable onPress={() => router.push("/(main)/NotificationsScreen")}>
           <Ionicons
             name="notifications-outline"
             size={hp(3.2)}
