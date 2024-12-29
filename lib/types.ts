@@ -35,3 +35,13 @@ export type fileType={
   fileUri: UriProps,
   isImage: boolean
 }
+
+export interface NotificationType {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  title: string;
+  data: string;
+  created_at?: string;
+ 
+}
