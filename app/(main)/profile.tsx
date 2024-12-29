@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AppScreenContainer } from "@/components/AppScreenContainer";
 import UserHeader from "@/components/UserHeader";
 import { useRouter } from "expo-router";
@@ -30,73 +30,96 @@ export default function Profile() {
   const { error, isError, isLoading: isSigningOut, signOut } = useSignOut();
   const [posts, setPosts] = useState<PostWithUser[] | null>([]);
   const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [limit, setLimit] = useState(5); // Move limit to state
 
-  let limit = 0;
   const getUserImage = useGetUserImage();
 
   const getPosts = async () => {
-    limit = limit + 5;
-    if (!hasMore) return null;
-    console.log("fetch how many post", limit);
-    const postsResult = await fetchPost(limit, user?.id);
-    if (postsResult) {
-      if (posts?.length == postsResult.length) setHasMore(false);
-      setPosts(postsResult ?? null);
+    if (!hasMore || isLoading) return null;
+    setIsLoading(true);
+
+    try {
+      console.log("fetch how many post", limit);
+      const postsResult = await fetchPost(limit, user?.id);
+
+      if (postsResult) {
+        if (posts?.length === postsResult.length) {
+          setHasMore(false);
+        }
+        setPosts(postsResult ?? null);
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getPosts();
+  }, [user?.id]); // Reload when user changes
+
+  const loadMore = () => {
+    if (!isLoading && hasMore) {
+      setLimit((prev) => prev + 5);
+      getPosts();
     }
   };
 
   const RenderHeader = () => {
     return (
-      <View style={{ padding: theme.Units.medium }}>
+      <>
         <UserHeader
           router={router}
           user={user!}
-          style={{ backgroundColor: "" }}
+          style={{ backgroundColor: "", paddingHorizontal: 0 }}
         />
-        <View style={{ alignSelf: "center", height: hp(12), width: hp(12) }}>
-          <Avatar
-            uri={getUserImage()}
-            rounded={theme.radius.xxl * 1.4}
-            size={hp(12)}
-          />
+        <View style={{ padding: theme.Units.medium }}>
+          <View style={{ alignSelf: "center", height: hp(12), width: hp(12) }}>
+            <Avatar
+              uri={getUserImage()}
+              rounded={theme.radius.xxl * 1.4}
+              size={hp(12)}
+            />
 
-          <Pressable
-            style={styles.editIcon}
-            onPress={() => router.push("/(main)/EditProfileScreen")}
-          >
-            <Feather name="edit-3" size={24} color="black" />
-          </Pressable>
-        </View>
-        {/* username and house number */}
-
-        <View style={{ alignItems: "center", gap: 4 }}>
-          <Text style={styles.name}>{user?.name}</Text>
-          <Text style={styles.address}>{user?.address}</Text>
-        </View>
-
-        <View style={{ gap: 10, marginTop: hp(4) }}>
-          {/* bio and email, phone */}
-          <View style={styles.info}>
-            <Icon name="mail" size={20} color={theme.colors.textLight} />
-            <Text>{user?.email ?? ""}</Text>
+            <Pressable
+              style={styles.editIcon}
+              onPress={() => router.push("/(main)/EditProfileScreen")}
+            >
+              <Feather name="edit-3" size={24} color="black" />
+            </Pressable>
           </View>
-        </View>
-        <View style={{ gap: 10, marginTop: hp(4) }}>
-          {/* bio and email, phone */}
-          {user?.phone && (
+          {/* username and house number */}
+
+          <View style={{ alignItems: "center", gap: 4 }}>
+            <Text style={styles.name}>{user?.name}</Text>
+            <Text style={styles.address}>{user?.address}</Text>
+          </View>
+
+          <View style={{ gap: 10, marginTop: hp(4) }}>
+            {/* bio and email, phone */}
             <View style={styles.info}>
-              <Icon name="call" size={20} color={theme.colors.textLight} />
-              <Text>{user?.phone ?? ""}</Text>
+              <Icon name="mail" size={20} color={theme.colors.textLight} />
+              <Text>{user?.email ?? ""}</Text>
             </View>
-          )}
+          </View>
+          <View style={{ gap: 10, marginTop: hp(4) }}>
+            {/* bio and email, phone */}
+            {user?.phone && (
+              <View style={styles.info}>
+                <Icon name="call" size={20} color={theme.colors.textLight} />
+                <Text>{user?.phone ?? ""}</Text>
+              </View>
+            )}
+          </View>
+          <View style={{ gap: 10, marginTop: hp(4) }}>
+            {/* bio and email, phone */}
+            {user?.bio && <Text>{user?.bio ?? ""}</Text>}
+          </View>
+          {/* this will be move to somewhere appropriate */}
         </View>
-        <View style={{ gap: 10, marginTop: hp(4) }}>
-          {/* bio and email, phone */}
-          {user?.bio && <Text>{user?.bio ?? ""}</Text>}
-        </View>
-        {/* this will be move to somewhere appropriate */}
-        <AppButton label="logout" onPress={signOut} loading={isSigningOut} />
-      </View>
+      </>
     );
   };
 
@@ -118,6 +141,8 @@ export default function Profile() {
         data={posts}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listStyle}
+        ListHeaderComponent={<RenderHeader />}
+        ListHeaderComponentStyle={{ marginBottom: 30 }}
         renderItem={({ item }) => (
           <PostCard
             item={item}
@@ -144,13 +169,8 @@ export default function Profile() {
           )
         }
         onEndReachedThreshold={0}
-        onEndReached={() => {
-          getPosts();
-          console.log("reached the end");
-        }}
+        onEndReached={() => loadMore}
       />
-
-      <RenderHeader />
     </AppScreenContainer>
   );
 }
