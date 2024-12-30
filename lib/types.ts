@@ -43,5 +43,6 @@ export interface NotificationType {
   title: string;
   data: string;
   created_at?: string;
+  user:userType
  
 }

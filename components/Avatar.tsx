@@ -6,7 +6,7 @@ import { theme } from "@/constants/theme";
 type avatarProps = {
   size: number;
   uri: string | { uri: string } | number;
-  rounded: number;
+  rounded?: number;
   style?: any;
 };
 export default function Avatar({ size, uri, rounded, style }: avatarProps) {

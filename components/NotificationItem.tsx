@@ -4,6 +4,8 @@ import { theme } from "@/constants/theme";
 import { hp } from "@/helpers/common";
 import { Router } from "expo-router";
 import { NotificationType } from "@/lib/types";
+import Avatar from "./Avatar";
+import { getImageFromUser } from "@/app/utils/getUserImage";
 type notificationItemProps = {
   router: Router;
   item: NotificationType;
@@ -15,9 +17,10 @@ export default function NotificationItem({
   const handleNotification = () => {
     router.push("/(main)/PostDetailsScreen");
   };
-  console.log("Notification item", item);
+  console.log("Notification item", item.user);
   return (
     <TouchableOpacity style={styles.container} onPress={handleNotification}>
+      <Avatar uri={getImageFromUser(item?.user)} size={hp(5)} />
       <Text>NotificationItem</Text>
     </TouchableOpacity>
   );
