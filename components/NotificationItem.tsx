@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { theme } from "@/constants/theme";
-import { hp } from "@/helpers/common";
+import { formatTime, hp } from "@/helpers/common";
 import { Router } from "expo-router";
 import { NotificationType } from "@/lib/types";
 import Avatar from "./Avatar";
@@ -21,7 +21,15 @@ export default function NotificationItem({
   return (
     <TouchableOpacity style={styles.container} onPress={handleNotification}>
       <Avatar uri={getImageFromUser(item?.user)} size={hp(5)} />
-      <Text>NotificationItem</Text>
+      <View style={styles.nameTitle}>
+        <Text style={styles.text}>{item.user.name}</Text>
+        <Text style={[styles.text, { color: theme.colors.textDark }]}>
+          {item.title}
+        </Text>
+      </View>
+      <Text style={[styles.text, { color: theme.colors.textLight }]}>
+        {formatTime(item.created_at ?? "")}
+      </Text>
     </TouchableOpacity>
   );
 }
