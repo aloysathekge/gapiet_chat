@@ -34,7 +34,7 @@ import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/hooks/notifications";
 
 export default function PostDetailsScreen() {
-  const { postId } = useLocalSearchParams();
+  const { postId, commentId } = useLocalSearchParams();
   // const { user: currentUser } = useSupabase();
 
   // console.log("Opened post with id ", postId);
@@ -248,6 +248,12 @@ export default function PostDetailsScreen() {
                     key={comment.id.toString()}
                     item={comment as commentWithUser}
                     onDelete={deleteComment}
+                    highlight={
+                      comment.id ===
+                      Number(
+                        Array.isArray(commentId) ? commentId[0] : commentId
+                      )
+                    }
                   />
                 ))}
 
