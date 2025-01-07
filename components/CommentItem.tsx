@@ -18,12 +18,14 @@ type commentItemProp = {
   canDelete: boolean;
   onDelete: (item: commentWithUser) => void;
   deleting: boolean;
+  highlight: boolean;
 };
 export default function CommentItem({
   item,
   canDelete,
   onDelete,
   deleting,
+  highlight,
 }: commentItemProp) {
   const handleDeleteComment = () => {
     Alert.alert("Confirm", "are you sure you want to delete comment?", [
@@ -51,7 +53,7 @@ export default function CommentItem({
         size={hp(4.3)}
         style={{ borderWidth: 2 }}
       />
-      <View style={styles.content}>
+      <View style={[styles.content, highlight && styles.highlight]}>
         <View
           style={{
             flexDirection: "row",
