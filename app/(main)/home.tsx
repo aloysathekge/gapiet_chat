@@ -26,6 +26,7 @@ export default function Home() {
   const [posts, setPosts] = useState<PostWithUser[] | null>([]);
   const [hasMore, setHasMore] = useState(true);
   const router = useRouter();
+  const [notificationCount, setNotificationCount] = useState(0);
 
   const handlePostEvent = async (payload: any) => {
     if (payload.eventType == "INSERT" && payload?.new?.id) {
@@ -43,18 +44,45 @@ export default function Home() {
       );
     }
   };
+
+  const handleNewNotification = async (payload: any) => {
+    if (payload.eventType == "INSERT" && payload?.new?.id) {
+      setNotificationCount((prevCount) => prevCount + 1);
+    }
+  };
+
   useEffect(() => {
     const postChannel = supabase
       .channel("posts")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "posts" },
+        {
+          event: "*",
+          schema: "public",
+          table: "posts",
+        },
         handlePostEvent
+      )
+      .subscribe();
+
+    //Create Notification channel
+    const notificationChannel = supabase
+      .channel("notifications")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `receiverId=eq.${user?.id}`,
+        },
+        handleNewNotification
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(postChannel);
+      supabase.removeChannel(notificationChannel);
     };
   }, []);
 
@@ -79,9 +107,11 @@ export default function Home() {
     console.log("Delete post", item);
   };
 
+  console.log("Notification count", notificationCount);
+
   return (
     <AppScreenContainer containerStyle={{ backgroundColor: "#fff" }}>
-      <MainHeader />
+      <MainHeader notificationCount={notificationCount} />
       <ScreenContent style={{ paddingHorizontal: wp(5) }}>
         <FlatList
           keyExtractor={(item: PostWithUser) => item.id.toString()}
