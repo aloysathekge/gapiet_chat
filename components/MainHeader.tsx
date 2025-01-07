@@ -7,39 +7,36 @@ import { useRouter } from "expo-router";
 import Avatar from "./Avatar";
 import { useGetUserImage } from "@/app/utils/getUserImage";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
-
-export default function MainHeader() {
+type mainHeaderProps = {
+  notificationCount?: number;
+};
+export default function MainHeader({ notificationCount = 0 }: mainHeaderProps) {
   const router = useRouter();
 
   const getUserImage = useGetUserImage();
-  const itemCount = 12;
   return (
     <View style={styles.header}>
       <Text style={styles.title}>Gapiet</Text>
       <View style={styles.icons}>
-        <Pressable onPress={() => router.push("/(main)/NotificationsScreen")}>
+        <Pressable
+          onPress={() => {
+            if (notificationCount > 0) {
+              notificationCount = 0;
+            }
+            router.push("/(main)/NotificationsScreen");
+          }}
+        >
           <Ionicons
             name="notifications-outline"
             size={hp(3.2)}
             strokeWidth={2}
             color={theme.colors.text}
           />
-          {/* {itemCount > 0 && (
-            <View
-              style={{
-                position: "absolute",
-                right: -6,
-                top: -8,
-                backgroundColor: "red",
-                height: hp(5),
-                borderRadius: 50,
-                paddingHorizontal: 6,
-                paddingVertical: 2,
-              }}
-            >
-              <Text style={{ color: "white", fontSize: 12 }}>{itemCount}</Text>
+          {notificationCount > 0 && (
+            <View style={styles.pill}>
+              <Text style={styles.pillText}>{notificationCount}</Text>
             </View>
-          )} */}
+          )}
         </Pressable>
 
         <Pressable onPress={() => router.push("/newPost")}>
@@ -82,5 +79,21 @@ const styles = StyleSheet.create({
     gap: 18,
     justifyContent: "center",
     alignItems: "center",
+  },
+  pill: {
+    position: "absolute",
+    right: -7,
+    top: -4,
+    height: hp(2.2),
+    width: hp(2.2),
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    backgroundColor: theme.colors.roseLight,
+  },
+  pillText: {
+    color: "#fff",
+    fontSize: hp(1.6),
+    fontWeight: "bold",
   },
 });
