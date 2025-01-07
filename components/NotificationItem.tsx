@@ -6,6 +6,7 @@ import { Router } from "expo-router";
 import { NotificationType } from "@/lib/types";
 import Avatar from "./Avatar";
 import { getImageFromUser } from "@/app/utils/getUserImage";
+import { useGetUser } from "@/hooks/queries";
 type notificationItemProps = {
   router: Router;
   item: NotificationType;
@@ -15,14 +16,19 @@ export default function NotificationItem({
   item,
 }: notificationItemProps) {
   const handleNotification = () => {
-    router.push("/(main)/PostDetailsScreen");
+    let { postId, commentId } = JSON.parse(item?.data);
+    router.push({
+      pathname: "/PostDetailsScreen",
+      params: { postId, commentId },
+    });
   };
-  console.log("Notification item", item.user);
+  const { data: senderDetails } = useGetUser(item.senderId);
+  console.log("Notification item Sender", senderDetails?.name);
   return (
     <TouchableOpacity style={styles.container} onPress={handleNotification}>
-      <Avatar uri={getImageFromUser(item?.user)} size={hp(5)} />
+      <Avatar uri={getImageFromUser(senderDetails ?? null)} size={hp(5)} />
       <View style={styles.nameTitle}>
-        <Text style={styles.text}>{item.user.name}</Text>
+        <Text style={styles.text}>{senderDetails?.name}</Text>
         <Text style={[styles.text, { color: theme.colors.textDark }]}>
           {item.title}
         </Text>
