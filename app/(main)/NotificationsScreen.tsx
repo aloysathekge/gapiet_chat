@@ -30,6 +30,7 @@ export default function NotificationsScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listStyle}
+        style={styles.container}
       >
         {notifications.map((notification) => (
           <NotificationItem
